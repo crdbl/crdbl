@@ -9,6 +9,7 @@
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "fastify-cli": "^7.4.0",
     "nx": "21.0.1",
     "prettier": "^2.6.2",
     "tslib": "^2.3.0",
