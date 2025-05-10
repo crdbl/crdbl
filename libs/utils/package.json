@@ -16,6 +16,8 @@
     }
   },
   "dependencies": {
+    "@noble/ed25519": "^2.2.3",
+    "multiformats": "^13.3.3",
     "tslib": "^2.3.0"
   }
 }
