@@ -2,6 +2,15 @@
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "jsx": "react-jsx"
-  }
+    "jsx": "react-jsx",
+    "paths": {
+      "@crdbl/utils": ["../../libs/utils/src/index.ts"],
+      "@crdbl/utils/*": ["../../libs/utils/src/*"]
+    }
+  },
+  "references": [
+    {
+      "path": "../../libs/utils"
+    }
+  ]
 }
