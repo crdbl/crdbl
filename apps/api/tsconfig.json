@@ -6,7 +6,16 @@
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
     "target": "ES2022",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@crdbl/utils": ["../../libs/utils/src/index.ts"],
+      "@crdbl/utils/*": ["../../libs/utils/src/*"]
+    }
   },
+  "references": [
+    {
+      "path": "../../libs/utils"
+    }
+  ],
   "include": ["src/**/*.ts"]
 }

@@ -89,6 +89,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@crdbl/utils':
+        specifier: workspace:*
+        version: link:../../libs/utils
       '@fastify/autoload':
         specifier: ^6.0.0
         version: 6.3.0
