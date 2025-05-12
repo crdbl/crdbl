@@ -1,5 +1,5 @@
 import * as ed from '@noble/ed25519';
-import { base58btc } from 'multiformats/bases/base58';
+import bs58 from 'bs58';
 
 export type HolderDidResult = {
   did: string;
@@ -16,7 +16,7 @@ export async function createHolderDid(): Promise<HolderDidResult> {
   const prefixed = new Uint8Array(2 + pub.length);
   prefixed.set([0xed, 0x01]); // multicodec: Ed25519‑pub
   prefixed.set(pub, 2);
-  const didKey = `did:key:z${base58btc.encode(prefixed)}`;
+  const didKey = `did:key:z${bs58.encode(prefixed)}`;
 
   return {
     did: didKey,
