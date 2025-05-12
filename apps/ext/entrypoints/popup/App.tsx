@@ -26,6 +26,7 @@ function App() {
         const response = await fetch(`${config.API_URL}/health`);
         setApiStatus(response.ok ? 'ok' : 'error');
       } catch (err) {
+        void err; // make eslint happy
         setApiStatus('error');
       }
     };
