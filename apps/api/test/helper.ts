@@ -4,6 +4,8 @@ import * as test from 'node:test'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+process.env.CHEQD_API_KEY = 'dummy';
+
 export type TestContext = {
   after: typeof test.after
 }
