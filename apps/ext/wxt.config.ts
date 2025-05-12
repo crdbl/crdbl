@@ -6,6 +6,10 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
 
+  manifest: {
+    permissions: ['storage'],
+  },
+
   vite: () => ({
     plugins: [tailwindcss(), tsconfigPaths()],
   }),
