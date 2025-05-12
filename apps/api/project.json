@@ -5,6 +5,14 @@
   "projectType": "application",
   "tags": [],
   "targets": {
+    "bootstrap": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "cwd": "apps/api",
+        "command": "node dist/bootstrap.js"
+      }
+    },
     "build": {
       "executor": "nx:run-script",
       "dependsOn": ["^build"],
