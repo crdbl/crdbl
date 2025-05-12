@@ -12,6 +12,12 @@
         "script": "build:ts"
       }
     },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prettier --check apps/api"
+      }
+    },
     "serve": {
       "executor": "nx:run-script",
       "options": {
