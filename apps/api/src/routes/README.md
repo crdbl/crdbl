@@ -27,3 +27,30 @@ functionality into the `plugins` folder, and share it via
 
 If you're a bit confused about using `async/await` to write routes, you would
 better take a look at [Promise resolution](https://fastify.dev/docs/latest/Reference/Routes/#promise-resolution) for more details.
+
+## /credential/issue
+
+**POST** `/credential/issue`
+
+Issue a credential for a subject DID, signed by the issuer DID stored in Redis.
+
+### Request Body
+
+```
+{
+  "subjectDid": "did:key:...", // required, the user's DID
+  "attributes": { "content": "string" }, // required, object with at least a 'content' string
+  "signature": "hexstring" // required, signature of attributes.content by subjectDid's private key
+}
+```
+
+### Response
+
+- On success: the issued credential object (from cheqd studio)
+- On error: `{ error: string }` with appropriate status code
+
+### Notes
+
+- The issuer DID must be present in Redis under the key 'issuer'.
+- The signature is verified using the public key from subjectDid.
+- The issued credential is stored in Redis under the key `credential:{subjectDid}`.
