@@ -62,9 +62,21 @@ export async function verifyHolderDid(
   if (!didKey.startsWith(prefix)) throw new Error('Invalid did:key');
   const base58 = didKey.slice(prefix.length);
   const decoded = bs58.decode(base58);
+
   // Remove multicodec prefix (2 bytes)
   const pub = decoded.slice(2);
   const msg = new TextEncoder().encode(content);
   const sig = ed.etc.hexToBytes(signatureHex);
+
+  if (pub.length !== 32)
+    throw new Error(
+      `Invalid public key length: ${pub.length}. Expected 32 bytes.`
+    );
+
+  if (sig.length !== 64)
+    throw new Error(
+      `Invalid signature length: ${sig.length}. Expected 64 bytes.`
+    );
+
   return await ed.verifyAsync(sig, msg, pub);
 }
