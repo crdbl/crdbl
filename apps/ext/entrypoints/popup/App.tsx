@@ -241,13 +241,49 @@ function App() {
           {credentials.length === 0 ? (
             <div>No credentials found.</div>
           ) : (
-            <ul className="list-disc pl-4">
-              {credentials.map((cred, idx) => (
-                <li key={idx} className="break-all">
-                  {cred.attributes?.content || JSON.stringify(cred)}
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col gap-2">
+              {credentials.map((cred, idx) => {
+                // Extract main info
+                const content =
+                  cred.credentialSubject?.content ||
+                  cred.attributes?.content ||
+                  '';
+                const issuanceDate =
+                  cred.issuanceDate ||
+                  cred.issuance_date ||
+                  cred.createdAt ||
+                  cred.created_at ||
+                  '';
+                // Hide proof.jwt for brevity in details
+                const details = { ...cred };
+                if (details.proof && details.proof.jwt) {
+                  details.proof = { ...details.proof, jwt: '[hidden]' };
+                }
+                return (
+                  <div
+                    className="collapse collapse-arrow bg-base-100"
+                    key={idx}
+                  >
+                    <input type="checkbox" />
+                    <div className="collapse-title font-medium flex flex-col gap-1">
+                      <span className="text-base font-semibold">
+                        {content || 'Credential'}
+                      </span>
+                      {issuanceDate && (
+                        <span className="text-xs text-gray-500">
+                          Issued: {new Date(issuanceDate).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="collapse-content">
+                      <pre className="mockup-code text-xs text-left whitespace-pre-wrap break-all">
+                        {JSON.stringify(details, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
