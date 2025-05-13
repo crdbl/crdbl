@@ -54,3 +54,22 @@ Issue a credential for a subject DID, signed by the issuer DID stored in Redis.
 - The issuer DID must be present in Redis under the key 'issuer'.
 - The signature is verified using the public key from subjectDid.
 - The issued credential is stored in Redis under the key `credential:{subjectDid}`.
+
+## /credential/list/:did
+
+**GET** `/credential/list/:did`
+
+List all credentials for a given holder DID.
+
+### Path Parameter
+
+- `did` (string, required): The holder's DID whose credentials you want to list.
+
+### Response
+
+- On success: An array of credential objects issued to the given holder DID.
+- On error: `{ error: string }` with appropriate status code
+
+### Notes
+
+- Credentials are stored in Redis under the key `credential:{did}` as a list. This endpoint returns all credentials for the specified DID.

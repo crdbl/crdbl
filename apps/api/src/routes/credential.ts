@@ -58,6 +58,32 @@ const credential: FastifyPluginAsync = async (
         .send({ error: error.message || 'Internal server error' });
     }
   });
+
+  // List all credentials for a given holder DID
+  fastify.get('/credential/list/:did', async function (request, reply) {
+    const { did } = request.params as { did: string };
+    if (!did) return reply.status(400).send({ error: 'Missing DID' });
+    try {
+      if (!redis.isOpen) await redis.connect();
+      const key = `credential:${did}`;
+      const credentials = await redis.lRange(key, 0, -1);
+      const parsed = credentials
+        .map((c) => {
+          try {
+            return JSON.parse(c);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      return parsed;
+    } catch (error: any) {
+      fastify.log.error(error);
+      return reply
+        .status(500)
+        .send({ error: error.message || 'Internal server error' });
+    }
+  });
 };
 
 export default credential;
