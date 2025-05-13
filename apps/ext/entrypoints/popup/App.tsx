@@ -12,7 +12,6 @@ const holderDid = storage.defineItem<{
 }>('local:holderDid');
 
 function App() {
-  const [count, setCount] = useState(0);
   const [did, setDid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -163,20 +162,6 @@ function App() {
                 : 'Checking...'}
             </span>
           </div>
-        </div>
-      </div>
-
-      <div className="card card-border bg-base-200">
-        <div className="card-body">
-          <button
-            className="btn"
-            onClick={() => setCount((count) => count + 1)}
-          >
-            count is {count}
-          </button>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test HMR
-          </p>
         </div>
       </div>
 
