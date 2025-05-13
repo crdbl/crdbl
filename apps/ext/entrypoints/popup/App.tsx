@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import reactLogo from '@/assets/react.svg';
-import { createHolderDid } from '@crdbl/utils';
+import { createHolderDid, signWithHolderDid } from '@crdbl/utils';
 import { storage } from '#imports';
 import { config } from '../../config';
 import './App.css';
@@ -19,6 +19,9 @@ function App() {
   const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'checking'>(
     'checking'
   );
+  const [credentialContent, setCredentialContent] = useState('');
+  const [credentials, setCredentials] = useState<any[]>([]);
+  const [isIssuing, setIsIssuing] = useState(false);
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -71,8 +74,64 @@ function App() {
     }
   };
 
+  // Fetch credentials for the current DID
+  const fetchCredentials = async (holderDid: string) => {
+    try {
+      const res = await fetch(`${config.API_URL}/credential/list/${holderDid}`);
+      if (!res.ok) throw new Error('Failed to fetch credentials');
+      const data = await res.json();
+      setCredentials(data);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch credentials'
+      );
+    }
+  };
+
+  // Fetch credentials on mount and when DID changes
+  useEffect(() => {
+    if (did) fetchCredentials(did);
+  }, [did]);
+
+  // Handler for credential issuance
+  const handleIssueCredential = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsIssuing(true);
+    setError(null);
+    try {
+      const stored = await holderDid.getValue();
+      if (!stored) throw new Error('No holder DID found');
+      const signature = await signWithHolderDid(
+        stored.privateKey,
+        credentialContent
+      );
+      const res = await fetch(`${config.API_URL}/credential/issue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectDid: stored.did,
+          attributes: { content: credentialContent },
+          signature,
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setCredentialContent('');
+      // Refresh credentials list
+      fetchCredentials(stored.did);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to issue credential'
+      );
+    } finally {
+      setIsIssuing(false);
+    }
+  };
+
   return (
     <>
+      <div className="prose">
+        <h1>crdbl</h1>
+      </div>
       <div className="flex justify-center">
         <a href="https://wxt.dev" target="_blank">
           <img src="/wxt.svg" className="logo" alt="WXT logo" />
@@ -81,7 +140,6 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>crdbl</h1>
 
       {/* API Status Indicator */}
       <div className="card card-border bg-base-200 mb-4">
@@ -146,6 +204,50 @@ function App() {
             >
               Create DID
             </button>
+          )}
+        </div>
+      </div>
+
+      <div className="card card-border bg-base-200 mt-4">
+        <div className="card-body">
+          <h2 className="card-title">Issue Credential</h2>
+          <form
+            onSubmit={handleIssueCredential}
+            className="flex flex-col gap-2"
+          >
+            <input
+              type="text"
+              className="input input-bordered"
+              placeholder="Enter credential content"
+              value={credentialContent}
+              onChange={(e) => setCredentialContent(e.target.value)}
+              disabled={!did || isIssuing}
+              required
+            />
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={!did || isIssuing || !credentialContent}
+            >
+              {isIssuing ? 'Issuing...' : 'Issue Credential'}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div className="card card-border bg-base-200 mt-4">
+        <div className="card-body">
+          <h2 className="card-title">Your Credentials</h2>
+          {credentials.length === 0 ? (
+            <div>No credentials found.</div>
+          ) : (
+            <ul className="list-disc pl-4">
+              {credentials.map((cred, idx) => (
+                <li key={idx} className="break-all">
+                  {cred.attributes?.content || JSON.stringify(cred)}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
