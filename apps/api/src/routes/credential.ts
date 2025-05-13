@@ -33,19 +33,23 @@ const credential: FastifyPluginAsync = async (
           .send({ error: 'Issuer DID not found in Redis' });
       }
       const issuer = JSON.parse(issuerRaw);
+
       const valid = await verifyHolderDid(
         subjectDid,
         attributes.content,
         signature
       );
       if (!valid) return reply.status(401).send({ error: 'Invalid signature' });
+
       const credential = await issueCredential({
         issuerDid: issuer.did,
         subjectDid,
         attributes,
       });
-      // Store credential in Redis
-      await redis.set(`credential:${subjectDid}`, JSON.stringify(credential));
+
+      // Store credential in Redis (append to list)
+      const key = `credential:${subjectDid}`;
+      await redis.rPush(key, JSON.stringify(credential));
       return credential;
     } catch (error: any) {
       fastify.log.error(error);
