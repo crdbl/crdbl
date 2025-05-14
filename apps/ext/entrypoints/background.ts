@@ -5,12 +5,12 @@ export default defineBackground(() => {
   browser.contextMenus.create({
     id: 'open-sidepanel',
     title: 'Open side panel',
-    contexts: ['all'],
+    contexts: ['action'],
   });
   browser.contextMenus.create({
     id: 'close-sidepanel',
     title: 'Close side panel',
-    contexts: ['all'],
+    contexts: ['action'],
   });
 
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
