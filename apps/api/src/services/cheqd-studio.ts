@@ -21,15 +21,17 @@ export async function createDid() {
 }
 
 export async function issueCredential(x: {
+  id?: string; // urn:uuid:<uuid>
   issuerDid: string; // did:cheqd:<uuid>
   subjectDid: string; // did:key:<uuid>
   attributes: Record<string, string>;
 }) {
-  const { issuerDid, subjectDid, attributes } = x;
+  const { id, issuerDid, subjectDid, attributes } = x;
   const r = await fetch(`${CHEQD_STUDIO_URL}/credential/issue`, {
     method: 'POST',
     headers: CHEQD_HEADERS,
     body: JSON.stringify({
+      id,
       issuerDid,
       subjectDid,
       attributes,

@@ -41,7 +41,9 @@ const credential: FastifyPluginAsync = async (
       );
       if (!valid) return reply.status(401).send({ error: 'Invalid signature' });
 
+      const id = `urn:uuid:${crypto.randomUUID()}`;
       const credential = await issueCredential({
+        id,
         issuerDid: issuer.did,
         subjectDid,
         attributes,
