@@ -11,6 +11,9 @@ const holderDid = storage.defineItem<{
   privateKey: string;
 }>('local:holderDid');
 
+// local storage item for selected text
+const selectedText = storage.defineItem<string>('local:selectedText');
+
 function App() {
   const [did, setDid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +95,22 @@ function App() {
     if (did) fetchCredentials(did);
   }, [did]);
 
+  // On mount, check and watch for selected text in storage
+  useEffect(() => {
+    selectedText.getValue().then((val) => {
+      if (val) setCredentialContent(val);
+    });
+
+    const unwatch = selectedText.watch((val) => {
+      if (val) setCredentialContent(val);
+    });
+
+    // cleanup
+    return () => {
+      unwatch();
+    };
+  }, []);
+
   // Handler for credential issuance
   const handleIssueCredential = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +134,8 @@ function App() {
       });
       if (!res.ok) throw new Error(await res.text());
       setCredentialContent('');
+      // Clear selected text from storage
+      selectedText.removeValue();
       // Refresh credentials list
       fetchCredentials(stored.did);
     } catch (err) {
@@ -195,10 +216,9 @@ function App() {
             onSubmit={handleIssueCredential}
             className="flex flex-col gap-2"
           >
-            <input
-              type="text"
-              className="input input-bordered"
-              placeholder="Enter credential content"
+            <textarea
+              className="textarea textarea-bordered min-h-[120px] max-h-[300px] w-full resize-y"
+              placeholder="Credential content"
               value={credentialContent}
               onChange={(e) => setCredentialContent(e.target.value)}
               disabled={!did || isIssuing}

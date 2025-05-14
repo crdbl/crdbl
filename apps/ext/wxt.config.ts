@@ -7,7 +7,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
 
   manifest: {
-    permissions: ['storage', 'sidepanel', 'sidebar_action'],
+    permissions: ['storage', 'sidepanel', 'sidebar_action', 'contextMenus'],
   },
 
   vite: () => ({
