@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import reactLogo from '@/assets/react.svg';
+import crdblLogo from '@/assets/crdbl.svg';
 import { createHolderDid, signWithHolderDid } from '@crdbl/utils';
 import { storage } from '#imports';
 import { config } from '../../config';
@@ -128,16 +128,11 @@ function App() {
 
   return (
     <>
-      <div className="prose">
-        <h1>crdbl</h1>
-      </div>
-      <div className="flex justify-center">
-        <a href="https://wxt.dev" target="_blank">
-          <img src="/wxt.svg" className="logo" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="flex justify-center items-center">
+        <img src={crdblLogo} className="logo" alt="Crdbl logo" />
+        <div className="prose">
+          <h1>crdbl</h1>
+        </div>
       </div>
 
       {/* API Status Indicator */}
@@ -178,8 +173,8 @@ function App() {
               <span className="loading loading-spinner loading-md"></span>
             </div>
           ) : did ? (
-            <div className="alert alert-success">
-              <span>Your DID: {did}</span>
+            <div className="alert alert-success justify-center">
+              <span>{did}</span>
             </div>
           ) : (
             <button
@@ -261,7 +256,7 @@ function App() {
                       )}
                     </div>
                     <div className="collapse-content">
-                      <pre className="mockup-code text-xs text-left whitespace-pre-wrap break-all">
+                      <pre className="text-xs text-left whitespace-pre-wrap break-all bg-base-300 p-2 rounded-xl">
                         {JSON.stringify(details, null, 2)}
                       </pre>
                     </div>
