@@ -259,15 +259,10 @@ function App() {
               {credentials.map((cred, idx) => {
                 // Extract main info
                 const content =
+                  cred.credentialSubject?.alias ||
                   cred.credentialSubject?.content ||
-                  cred.attributes?.content ||
                   '';
-                const issuanceDate =
-                  cred.issuanceDate ||
-                  cred.issuance_date ||
-                  cred.createdAt ||
-                  cred.created_at ||
-                  '';
+                const issuanceDate = cred.issuanceDate || '';
                 // Hide proof.jwt for brevity in details
                 const details = { ...cred };
                 if (details.proof && details.proof.jwt) {
