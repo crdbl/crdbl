@@ -6,7 +6,7 @@ import {
   signWithHolderDid,
 } from '@crdbl/utils';
 import { storage } from '#imports';
-import { config } from '../../config';
+import { config } from '../../src/config';
 import './App.css';
 
 // local storage for the holder DID
