@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import crdblLogo from '@/assets/crdbl.svg';
-import { createHolderDid, signWithHolderDid } from '@crdbl/utils';
+import {
+  CrdblCredentialIssueRequest,
+  createHolderDid,
+  signWithHolderDid,
+} from '@crdbl/utils';
 import { storage } from '#imports';
 import { config } from '../../config';
 import './App.css';
@@ -119,20 +123,30 @@ function App() {
     try {
       const stored = await holderDid.getValue();
       if (!stored) throw new Error('No holder DID found');
+
       const signature = await signWithHolderDid(
         stored.privateKey,
         credentialContent
       );
+
+      const req: CrdblCredentialIssueRequest = {
+        subjectDid: stored.did,
+        attributes: {
+          content: credentialContent,
+          context: [],
+        },
+        signature,
+        opts: {
+          generateAlias: true,
+        },
+      };
       const res = await fetch(`${config.API_URL}/credential/issue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjectDid: stored.did,
-          attributes: { content: credentialContent },
-          signature,
-        }),
+        body: JSON.stringify(req),
       });
       if (!res.ok) throw new Error(await res.text());
+
       setCredentialContent('');
       // Clear selected text from storage
       selectedText.removeValue();
