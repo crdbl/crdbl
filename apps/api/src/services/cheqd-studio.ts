@@ -1,3 +1,4 @@
+import { CrdblCredentialAttributes } from '@crdbl/utils';
 import { CHEQD_HEADERS, CHEQD_NETWORK, CHEQD_STUDIO_URL } from '../config.js';
 import {
   CreateDidResponse,
@@ -21,10 +22,10 @@ export async function createDid() {
 }
 
 export async function issueCredential(x: {
-  id?: string; // urn:uuid:<uuid>
+  id?: string;
   issuerDid: string; // did:cheqd:<uuid>
   subjectDid: string; // did:key:<uuid>
-  attributes: Record<string, string>;
+  attributes: CrdblCredentialAttributes;
 }) {
   const { id, issuerDid, subjectDid, attributes } = x;
   const r = await fetch(`${CHEQD_STUDIO_URL}/credential/issue`, {

@@ -1,26 +1,36 @@
 import { FastifyPluginAsync } from 'fastify';
 import { createClient } from 'redis';
+import { customAlphabet } from 'nanoid';
+import { nolookalikesSafe } from 'nanoid-dictionary';
 import { REDIS_URL } from '../config.js';
 import { issueCredential } from '../services/cheqd-studio.js';
-import { verifyHolderDid } from '@crdbl/utils';
+import { CrdblCredentialAttributes, verifyHolderDid } from '@crdbl/utils';
 
 const redis = createClient({ url: REDIS_URL });
+
+const nanoid = (length = 10): string =>
+  customAlphabet(nolookalikesSafe, length)();
 
 const credential: FastifyPluginAsync = async (
   fastify,
   _opts
 ): Promise<void> => {
   fastify.post('/credential/issue', async function (request, reply) {
-    const { subjectDid, attributes, signature } = request.body as {
+    const { subjectDid, attributes, signature, opts } = request.body as {
       subjectDid?: string;
-      attributes?: { content: string };
+      attributes?: CrdblCredentialAttributes;
       signature?: string;
+      // crdbl-specific options
+      opts?: {
+        // default: false; iff true, generate short unique identifier
+        generateAlias?: boolean;
+      };
     };
     if (
       !subjectDid ||
       !attributes ||
-      typeof attributes.content !== 'string' ||
-      !signature
+      !signature ||
+      typeof attributes.content !== 'string'
     ) {
       return reply.status(400).send({ error: 'Missing required fields' });
     }
@@ -41,17 +51,28 @@ const credential: FastifyPluginAsync = async (
       );
       if (!valid) return reply.status(401).send({ error: 'Invalid signature' });
 
+      const alias = opts?.generateAlias ? nanoid() : undefined;
       const id = `urn:uuid:${crypto.randomUUID()}`;
+
       const credential = await issueCredential({
         id,
         issuerDid: issuer.did,
         subjectDid,
-        attributes,
+        attributes: {
+          ...attributes,
+          alias,
+        },
       });
 
-      // Store credential in Redis (append to list)
-      const key = `credential:${subjectDid}`;
-      await redis.rPush(key, JSON.stringify(credential));
+      // Store credential (keyed by id)
+      await redis.set(`credential:${id}`, JSON.stringify(credential));
+
+      // Store alias, if there is one
+      if (alias) await redis.set(`alias:${alias}`, id);
+
+      // Store credential id in set for the holder
+      await redis.sAdd(`holder:${subjectDid}`, id);
+
       return credential;
     } catch (error: any) {
       fastify.log.error(error);
@@ -67,17 +88,18 @@ const credential: FastifyPluginAsync = async (
     if (!did) return reply.status(400).send({ error: 'Missing DID' });
     try {
       if (!redis.isOpen) await redis.connect();
-      const key = `credential:${did}`;
-      const credentials = await redis.lRange(key, 0, -1);
-      const parsed = credentials
-        .map((c) => {
+      const ids = await redis.sMembers(`holder:${did}`);
+      const credentials = await Promise.all(
+        ids.map(async (id) => {
+          const c = await redis.get(`credential:${id}`);
           try {
-            return JSON.parse(c);
+            return c ? JSON.parse(c) : null;
           } catch {
             return null;
           }
         })
-        .filter(Boolean);
+      );
+      const parsed = credentials.filter(Boolean);
       return parsed;
     } catch (error: any) {
       fastify.log.error(error);

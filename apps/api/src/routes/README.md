@@ -40,7 +40,10 @@ Issue a credential for a subject DID, signed by the issuer DID stored in Redis.
 {
   "subjectDid": "did:key:...", // required, the user's DID
   "attributes": { "content": "string" }, // required, object with at least a 'content' string
-  "signature": "hexstring" // required, signature of attributes.content by subjectDid's private key
+  "signature": "hexstring", // required, signature of attributes.content by subjectDid's private key
+  "opts": { // optional
+    "generateAlias": false // optional, generate a short human-friendly alias in addition to its uuid
+  }
 }
 ```
 
