@@ -98,6 +98,38 @@ const credential: FastifyPluginAsync = async (
         .send({ error: error.message || 'Internal server error' });
     }
   });
+
+  // Retrieve a credential by its id or alias
+  fastify.get('/credential/:id', async function (request, reply) {
+    const { id } = request.params as { id: string };
+    if (!id) return reply.status(400).send({ error: 'Missing identifier' });
+
+    try {
+      if (!redis.isOpen) await redis.connect();
+
+      // Try to get by id first
+      let credentialRaw = await redis.get(`credential:${id}`);
+      if (!credentialRaw) {
+        // Try to resolve alias
+        const uuid = await redis.get(`alias:${id}`);
+        if (uuid) credentialRaw = await redis.get(`credential:${id}`);
+      }
+
+      if (!credentialRaw)
+        return reply.status(404).send({ error: 'Credential not found' });
+
+      try {
+        return JSON.parse(credentialRaw);
+      } catch {
+        return reply.status(500).send({ error: 'Corrupt credential data' });
+      }
+    } catch (error: any) {
+      fastify.log.error(error);
+      return reply
+        .status(500)
+        .send({ error: error.message || 'Internal server error' });
+    }
+  });
 };
 
 export default credential;
