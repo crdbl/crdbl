@@ -112,7 +112,7 @@ const credential: FastifyPluginAsync = async (
       if (!credentialRaw) {
         // Try to resolve alias
         const uuid = await redis.get(`alias:${id}`);
-        if (uuid) credentialRaw = await redis.get(`credential:${id}`);
+        if (uuid) credentialRaw = await redis.get(`credential:${uuid}`);
       }
 
       if (!credentialRaw)
