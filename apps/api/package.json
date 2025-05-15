@@ -25,6 +25,8 @@
     "fastify": "^5.0.0",
     "fastify-cli": "^7.4.0",
     "fastify-plugin": "^5.0.0",
+    "nanoid": "^5.1.5",
+    "nanoid-dictionary": "^5.0.0",
     "redis": "^5.0.1"
   },
   "devDependencies": {
