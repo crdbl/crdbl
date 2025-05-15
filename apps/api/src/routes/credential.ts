@@ -4,7 +4,7 @@ import { customAlphabet } from 'nanoid';
 import { nolookalikesSafe } from 'nanoid-dictionary';
 import { REDIS_URL } from '../config.js';
 import { issueCredential } from '../services/cheqd-studio.js';
-import { CrdblCredentialAttributes, verifyHolderDid } from '@crdbl/utils';
+import { CrdblCredentialIssueRequest, verifyHolderDid } from '@crdbl/utils';
 
 const redis = createClient({ url: REDIS_URL });
 
@@ -16,16 +16,8 @@ const credential: FastifyPluginAsync = async (
   _opts
 ): Promise<void> => {
   fastify.post('/credential/issue', async function (request, reply) {
-    const { subjectDid, attributes, signature, opts } = request.body as {
-      subjectDid?: string;
-      attributes?: CrdblCredentialAttributes;
-      signature?: string;
-      // crdbl-specific options
-      opts?: {
-        // default: false; iff true, generate short unique identifier
-        generateAlias?: boolean;
-      };
-    };
+    const { subjectDid, attributes, signature, opts } =
+      request.body as CrdblCredentialIssueRequest;
     if (
       !subjectDid ||
       !attributes ||
@@ -38,9 +30,7 @@ const credential: FastifyPluginAsync = async (
       if (!redis.isOpen) await redis.connect();
       const issuerRaw = await redis.get('issuer');
       if (!issuerRaw) {
-        return reply
-          .status(500)
-          .send({ error: 'Issuer DID not found in Redis' });
+        return reply.status(500).send({ error: 'Issuer DID not found' });
       }
       const issuer = JSON.parse(issuerRaw);
 

@@ -1,14 +1,15 @@
+import { CrdblCredentialAttributes } from '@crdbl/utils';
+
 export type CreateDidResponse = {
   did: string;
   controllerKeyId: string;
 };
 
+export type CredentialSubject = { id: string } & CrdblCredentialAttributes;
+
 export type CredentialIssueResponse = {
   '@context': string[];
-  credentialSubject: {
-    id: string; // did:key:<uuid>
-    // ?: name: string;
-  };
+  credentialSubject: CredentialSubject;
   credentialStatus: object;
   issuanceDate: string; // ISO 8601 date-time
   issuer: {
