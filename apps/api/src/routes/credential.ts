@@ -4,6 +4,7 @@ import { nolookalikesSafe } from 'nanoid-dictionary';
 import { CrdblCredentialIssueRequest, verifyHolderDid } from '@crdbl/utils';
 import { issueCredential, verifyCredential } from '../services/cheqd-studio.js';
 import db from '../services/db.js';
+import { evaluateContent } from '../services/ai.js';
 
 const nanoid = (length = 10): string =>
   customAlphabet(nolookalikesSafe, length)();
@@ -37,6 +38,8 @@ const credential: FastifyPluginAsync = async (
       return reply.status(400).send({ error: 'Missing required fields' });
     }
     try {
+      const context = []; // all referenced context
+
       // Check all context crdbls exist and are verified
       for (const ctxId of attributes.context) {
         const { cred: ctxCred, verif: ctxVerif } = await getOrVerifyCredential(
@@ -52,6 +55,7 @@ const credential: FastifyPluginAsync = async (
             .status(400)
             .send({ error: `Context credential not verified: ${ctxId}` });
         }
+        context.push(ctxCred.credentialSubject.content);
       }
 
       const issuer = await db.getIssuer();
@@ -65,6 +69,17 @@ const credential: FastifyPluginAsync = async (
         signature
       );
       if (!valid) return reply.status(401).send({ error: 'Invalid signature' });
+
+      // evaulate content as cliams within context
+      if (context.length > 0) {
+        const credible = await evaluateContent(attributes.content, context);
+        console.log('AI eval', credible);
+        // NOTE: don't worry about ambiguous (3) for now
+        if (credible === 0)
+          return reply
+            .status(400)
+            .send({ error: 'Content is not credible within the context' });
+      }
 
       const alias = opts?.generateAlias ? nanoid() : undefined;
       const id = `urn:uuid:${crypto.randomUUID()}`;
