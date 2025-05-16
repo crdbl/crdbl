@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import crdblLogo from '@/assets/crdbl.svg';
 import {
+  CrdblCredential,
   CrdblCredentialIssueRequest,
   createHolderDid,
   signWithHolderDid,
@@ -26,7 +27,7 @@ function App() {
     'checking'
   );
   const [credentialContent, setCredentialContent] = useState('');
-  const [credentials, setCredentials] = useState<any[]>([]);
+  const [credentials, setCredentials] = useState<CrdblCredential[]>([]);
   const [isIssuing, setIsIssuing] = useState(false);
 
   useEffect(() => {
@@ -85,7 +86,7 @@ function App() {
     try {
       const res = await fetch(`${config.API_URL}/credential/list/${holderDid}`);
       if (!res.ok) throw new Error('Failed to fetch credentials');
-      const data = await res.json();
+      const data = (await res.json()) as CrdblCredential[];
       setCredentials(data);
     } catch (err) {
       setError(
