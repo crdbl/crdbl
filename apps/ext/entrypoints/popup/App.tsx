@@ -27,6 +27,7 @@ function App() {
     'checking'
   );
   const [credentialContent, setCredentialContent] = useState('');
+  const [credentialContext, setCredentialContext] = useState('');
   const [credentials, setCredentials] = useState<CrdblCredential[]>([]);
   const [isIssuing, setIsIssuing] = useState(false);
 
@@ -134,7 +135,7 @@ function App() {
         subjectDid: stored.did,
         attributes: {
           content: credentialContent,
-          context: [],
+          context: credentialContext.split(/[\s,]+/),
         },
         signature,
         opts: {
@@ -149,6 +150,7 @@ function App() {
       if (!res.ok) throw new Error(await res.text());
 
       setCredentialContent('');
+      setCredentialContext('');
       // Clear selected text from storage
       selectedText.removeValue();
       // Refresh credentials list
@@ -227,12 +229,26 @@ function App() {
           <label className="label">Crdbl Content</label>
           <textarea
             className="textarea textarea-bordered min-h-[120px] max-h-[300px] w-full resize-y"
-            placeholder="Credential content"
+            placeholder=""
             value={credentialContent}
             onChange={(e) => setCredentialContent(e.target.value)}
             disabled={!did || isIssuing}
             required
           />
+
+          <label className="label">Crdbl Context</label>
+          <input
+            type="text"
+            className="input input-bordered w-full"
+            placeholder=""
+            value={credentialContext}
+            onChange={(e) => setCredentialContext(e.target.value)}
+            disabled={!did || isIssuing}
+          />
+          <p className="label">
+            List other referenced crdbls (space separated).
+          </p>
+
           <button
             className="btn btn-primary"
             type="submit"
