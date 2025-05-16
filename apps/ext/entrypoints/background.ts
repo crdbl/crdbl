@@ -1,14 +1,35 @@
 import { storage } from '#imports';
+import { CredentialVerification } from '@crdbl/utils';
+import { config } from '../src/config';
 import { onMessage } from '../src/messaging';
 
-// session cache of crdbl verification results
+// session cache of crdbl verifications
 const cache = new Map<string, boolean>();
 
 export default defineBackground(() => {
   console.log('Hello background!', { id: browser.runtime.id });
 
-  onMessage('getCrdblVerification', (msg) => {
+  onMessage('getCrdblVerification', async (msg) => {
     const uuids = msg.data;
+
+    // fetch verification results for those not in cache
+    const unknown = uuids.filter((u: string) => !cache.has(u));
+    if (unknown.length) {
+      const pairs = await Promise.all(
+        unknown.map(async (id: string) => {
+          try {
+            const r = await fetch(`${config.API_URL}/credential/verify/${id}`);
+            if (!r.ok) throw new Error();
+            const { verified } = (await r.json()) as CredentialVerification;
+            return [id, verified] as const;
+          } catch {
+            return [id, false] as const;
+          }
+        })
+      );
+      pairs.forEach(([id, ok]) => cache.set(id, ok));
+    }
+
     return Object.fromEntries(
       uuids.map((u: string) => [u, cache.get(u) ?? false])
     );
