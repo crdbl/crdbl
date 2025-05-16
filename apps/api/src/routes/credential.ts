@@ -1,12 +1,9 @@
 import { FastifyPluginAsync } from 'fastify';
-import { createClient } from 'redis';
 import { customAlphabet } from 'nanoid';
 import { nolookalikesSafe } from 'nanoid-dictionary';
-import { REDIS_URL } from '../config.js';
 import { issueCredential } from '../services/cheqd-studio.js';
 import { CrdblCredentialIssueRequest, verifyHolderDid } from '@crdbl/utils';
-
-const redis = createClient({ url: REDIS_URL });
+import db from '../services/db.js';
 
 const nanoid = (length = 10): string =>
   customAlphabet(nolookalikesSafe, length)();
@@ -27,12 +24,9 @@ const credential: FastifyPluginAsync = async (
       return reply.status(400).send({ error: 'Missing required fields' });
     }
     try {
-      if (!redis.isOpen) await redis.connect();
-      const issuerRaw = await redis.get('issuer');
-      if (!issuerRaw) {
+      const issuer = await db.getIssuer();
+      if (!issuer)
         return reply.status(500).send({ error: 'Issuer DID not found' });
-      }
-      const issuer = JSON.parse(issuerRaw);
 
       const valid = await verifyHolderDid(
         subjectDid,
@@ -54,15 +48,7 @@ const credential: FastifyPluginAsync = async (
         },
       });
 
-      // Store credential (keyed by id)
-      await redis.set(`credential:${id}`, JSON.stringify(credential));
-
-      // Store alias, if there is one
-      if (alias) await redis.set(`alias:${alias}`, id);
-
-      // Store credential id in set for the holder
-      await redis.sAdd(`holder:${subjectDid}`, id);
-
+      await db.setCred(id, credential, subjectDid);
       return credential;
     } catch (error: any) {
       fastify.log.error(error);
@@ -77,20 +63,7 @@ const credential: FastifyPluginAsync = async (
     const { did } = request.params as { did: string };
     if (!did) return reply.status(400).send({ error: 'Missing DID' });
     try {
-      if (!redis.isOpen) await redis.connect();
-      const ids = await redis.sMembers(`holder:${did}`);
-      const credentials = await Promise.all(
-        ids.map(async (id) => {
-          const c = await redis.get(`credential:${id}`);
-          try {
-            return c ? JSON.parse(c) : null;
-          } catch {
-            return null;
-          }
-        })
-      );
-      const parsed = credentials.filter(Boolean);
-      return parsed;
+      return await db.getCredsByHolder(did);
     } catch (error: any) {
       fastify.log.error(error);
       return reply
@@ -105,24 +78,10 @@ const credential: FastifyPluginAsync = async (
     if (!id) return reply.status(400).send({ error: 'Missing identifier' });
 
     try {
-      if (!redis.isOpen) await redis.connect();
-
-      // Try to get by id first
-      let credentialRaw = await redis.get(`credential:${id}`);
-      if (!credentialRaw) {
-        // Try to resolve alias
-        const uuid = await redis.get(`alias:${id}`);
-        if (uuid) credentialRaw = await redis.get(`credential:${uuid}`);
-      }
-
-      if (!credentialRaw)
+      const cred = await db.getCred(id);
+      if (!cred)
         return reply.status(404).send({ error: 'Credential not found' });
-
-      try {
-        return JSON.parse(credentialRaw);
-      } catch {
-        return reply.status(500).send({ error: 'Corrupt credential data' });
-      }
+      return cred;
     } catch (error: any) {
       fastify.log.error(error);
       return reply

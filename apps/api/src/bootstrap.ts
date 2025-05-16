@@ -1,17 +1,11 @@
-import { CreateDidResponse } from '@crdbl/utils';
-import { createClient } from 'redis';
 import { createDid } from './services/cheqd-studio.js';
-import { REDIS_URL } from './config.js';
-
-const redis = createClient({ url: REDIS_URL });
-await redis.connect();
+import db from './services/db.js';
 
 console.log('Creating issuer DID...');
 const issuer = await createDid();
-await redis.set('issuer', JSON.stringify(issuer));
+await db.setIssuer(issuer);
 
-const v = await redis.get('issuer');
-const issuer_: CreateDidResponse = JSON.parse(v ?? '{}');
+const issuer_ = await db.getIssuer();
 console.log('issuer created', issuer_);
 
-await redis.quit();
+await db.redis.quit();
