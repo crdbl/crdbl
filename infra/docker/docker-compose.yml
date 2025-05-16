@@ -1,0 +1,10 @@
+services:
+  redis:
+    image: redis:8-alpine
+    command: redis-server --appendonly yes # AOF persistence
+    volumes:
+      - ./data:/data
+    # - redisdata:/data
+    ports: ['6379:6379']
+# volumes:
+#   redisdata: {} # named volume lives outside the container

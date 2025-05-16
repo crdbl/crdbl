@@ -1,0 +1,17 @@
+{
+  "name": "infrastructure",
+  "targets": {
+    "up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f infra/docker/compose.dev.yml up --detach"
+      }
+    },
+    "down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f infra/docker/compose.dev.yml down"
+      }
+    }
+  }
+}
