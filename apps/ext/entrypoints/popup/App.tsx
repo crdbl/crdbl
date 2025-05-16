@@ -128,7 +128,8 @@ function App() {
 
       const signature = await signWithHolderDid(
         stored.privateKey,
-        credentialContent
+        credentialContent,
+        credentialContext.split(/[\s,]+/)
       );
 
       const req: CrdblCredentialIssueRequest = {
@@ -196,13 +197,14 @@ function App() {
         </div>
       </div>
 
+      {error && (
+        <div className="alert alert-error mt-4">
+          <span>{error}</span>
+        </div>
+      )}
+
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
         <legend className="fieldset-legend">Decentralized identifier</legend>
-        {error && (
-          <div className="alert alert-error">
-            <span>{error}</span>
-          </div>
-        )}
         {isLoading ? (
           <div className="flex justify-center">
             <span className="loading loading-spinner loading-md"></span>
