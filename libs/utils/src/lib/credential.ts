@@ -30,31 +30,37 @@ export async function createHolderDid(): Promise<HolderDidResult> {
 }
 
 /**
- * Sign a string using the holder's private key (hex).
+ * Sign a string and context using the holder's private key (hex).
  * @param privateKeyHex - The private key in hex format
  * @param content - The string to sign
+ * @param context - The context array to include in the signature
  * @returns Promise<string> - The signature as a hex string
  */
 export async function signWithHolderDid(
   privateKeyHex: string,
-  content: string
+  content: string,
+  context: string[]
 ): Promise<string> {
   const priv = ed.etc.hexToBytes(privateKeyHex);
-  const msg = new TextEncoder().encode(content);
+  const msg = new TextEncoder().encode(
+    content + '\n' + JSON.stringify(context ?? [])
+  );
   const sig = await ed.signAsync(msg, priv);
   return ed.etc.bytesToHex(sig);
 }
 
 /**
- * Verify a signature over a string using the public key from a did:key.
+ * Verify a signature over a string and context using the public key from a did:key.
  * @param didKey - The did:key string (e.g., did:key:z...)
  * @param content - The string that was signed
+ * @param context - The context array that was included in the signature
  * @param signatureHex - The signature as a hex string
  * @returns Promise<boolean> - True if valid, false otherwise
  */
 export async function verifyHolderDid(
   didKey: string,
   content: string,
+  context: string[],
   signatureHex: string
 ): Promise<boolean> {
   // Extract base58 public key from did:key
@@ -65,7 +71,9 @@ export async function verifyHolderDid(
 
   // Remove multicodec prefix (2 bytes)
   const pub = decoded.slice(2);
-  const msg = new TextEncoder().encode(content);
+  const msg = new TextEncoder().encode(
+    content + '\n' + JSON.stringify(context ?? [])
+  );
   const sig = ed.etc.hexToBytes(signatureHex);
 
   if (pub.length !== 32)
