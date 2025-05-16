@@ -1,5 +1,111 @@
 # crdbl
 
+**crdbl** is an open-source platform for building a more credible web by enabling the creation, verification, and consumption of content credentials—verifiable credentials (VCs) that prove the provenance and veracity of both AI-generated and human-created content. It combines decentralized identity (DID), cryptographic signatures, and AI-powered context verification to establish trust in digital information.
+
+## Key Features
+
+- **Content Credentials & Provenance**:
+  Any chunk of content (text, data, code, etc.) can be turned into a verifiable credential (VC) with a decentralized identifier (DID) as its subject. These credentials can reference other credentials, enabling recursive, compositional trust and supporting complex, verifiable datasets.
+
+- **AI-Powered Context Verification**:
+  When issuing a new credential, referenced credentials (the "context") are recursively fetched and verified. An AI model (e.g., OpenAI GPT) checks that the new claim does not contradict its referenced context, ensuring that composed claims are valid and trustworthy.
+
+- **Browser Extension for Easy Use**:
+  The web extension allows users to:
+
+  - Instantly create a DID and issue credentials for selected content in the browser.
+  - Reference other crdbls (credentials) as context, supporting deep, recursive provenance.
+  - View and manage their issued credentials.
+  - See in-page annotations indicating which content is verified and by whom.
+
+- **API for Credential Management**:
+  The backend exposes endpoints to issue, list, retrieve, and verify credentials. Each credential is cryptographically signed and can be independently verified, including its context.
+
+- **Recursive, Composable Trust**:
+  Credentials can reference other credentials, forming a verifiable chain (or graph) of trust. This supports use cases like verifying research, journalism, or AI-generated data with full provenance.
+
+## How It Works
+
+1. **DID Creation**:
+   Users (holders) generate a DID (using Ed25519 keys, fully in-browser for privacy) to represent their identity.
+
+2. **Issuing a Credential**:
+
+   - The user selects content and (optionally) references other crdbls as context.
+   - The extension signs the content and context with the user's DID.
+   - The backend verifies referenced credentials, then uses AI to check that the new claim is consistent with its context.
+   - If valid, a new VC is issued (using cheqd's network for decentralized trust) and stored.
+
+3. **Verification**:
+   - Anyone can verify a credential (and its context) via the API or browser extension.
+   - The extension annotates content in the browser, showing which claims are verified and by whom.
+
+## Why cheqd?
+
+- **Decentralized Trust Infrastructure**:
+  cheqd provides a decentralized network for issuing and verifying DIDs and VCs, ensuring that credentials are tamper-proof and not reliant on a single authority.
+
+- **Ownership and Control**:
+  Each crdbl is owned by a DID, and only the holder can issue credentials for their content. This supports user authenticity and reputation.
+
+- **Interoperability**:
+  By using W3C-standard DIDs and VCs, crdbl credentials can be used across platforms and ecosystems.
+
+## AI for Context Verification
+
+- When a new credential is issued, the referenced context is recursively fetched and verified.
+- An AI model checks that the new claim does not contradict its context, outputting:
+  - `1` if the claim is consistent,
+  - `0` if it contradicts,
+  - `3` if the context is insufficient.
+- This ensures that composed claims (e.g., summaries, analyses, or AI-generated content) are only issued if they are credible within their referenced context.
+
+## Example Use Cases
+
+- **Verifying AI-Generated Content**:
+  Prove that an AI summary or analysis is consistent with referenced source material.
+- **Research & Journalism**:
+  Build a chain of trust from primary sources through analysis and reporting.
+- **Data Provenance**:
+  Reference and verify datasets, with full traceability and composability.
+
+## Business Model (Future)
+
+- **Monetization**:
+  Content creators can be paid when others reference their crdbls in new credentials. AI verification costs are covered by credential issuance fees.
+
+---
+
+## Quick Start
+
+1. Install the browser extension and create your DID.
+2. Select content in your browser and issue a crdbl credential.
+3. Reference other crdbls for context to build compositional trust.
+4. Use the extension or API to verify content anywhere on the web.
+
+---
+
+## API Endpoints
+
+- `POST /credential/issue` — Issue a new credential, referencing other crdbls as context.
+- `GET /credential/list/:did` — List all credentials for a DID.
+- `GET /credential/:id` — Retrieve a credential by ID or alias.
+- `GET /credential/verify/:id` — Verify a credential and its context.
+
+See `apps/api/src/routes/README.md` for full API documentation.
+
+---
+
+## Learn More
+
+- [cheqd Network](https://cheqd.io/)
+- [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/)
+- [Decentralized Identifiers (DIDs)](https://www.w3.org/TR/did-core/)
+
+---
+
+**crdbl** is building the trust layer for the credible web—where every claim, dataset, or AI output can be independently verified, with full provenance and context.
+
 <details>
 
 <summary>Nx Workspace</summary>
