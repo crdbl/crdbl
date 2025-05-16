@@ -39,8 +39,11 @@ Issue a credential for a subject DID, signed by the issuer DID stored in Redis.
 ```
 {
   "subjectDid": "did:key:...", // required, the user's DID
-  "attributes": { "content": "string" }, // required, object with at least a 'content' string
-  "signature": "hexstring", // required, signature of attributes.content by subjectDid's private key
+  "attributes": {
+    "content": "string", // required, main content
+    "context": ["crdbl-id-or-alias-1", "crdbl-id-or-alias-2"] // required, array of credential references (ids or aliases)
+  },
+  "signature": "hexstring", // required, signature of (attributes.content + attributes.context) by subjectDid's private key
   "opts": { // optional
     "generateAlias": false // optional, generate a short human-friendly alias in addition to its uuid
   }
@@ -55,8 +58,17 @@ Issue a credential for a subject DID, signed by the issuer DID stored in Redis.
 ### Notes
 
 - The issuer DID must be present in Redis under the key 'issuer'.
-- The signature is verified using the public key from subjectDid.
+- The signature is verified using the public key from subjectDid, and must cover both `attributes.content` and `attributes.context` (as a JSON array).
+- Before issuing, **every credential referenced in `attributes.context` must exist locally and be verified**. Verification uses the same logic as `/credential/verify/:id`: it first checks the cache, then verifies and caches the result if not present.
+- If any context credential is missing or not verified, the endpoint returns an error.
+- Context references can be either credential ids or aliases.
 - The issued credential is stored in Redis under the key `credential:{subjectDid}`.
+
+#### Error Cases
+
+- `400 Bad Request`: If required fields are missing, if any context credential is not found, or if any context credential is not verified.
+- `401 Unauthorized`: If the signature is invalid.
+- `500 Internal Server Error`: If there is a server or data parsing error.
 
 ## /credential/list/:did
 
@@ -128,4 +140,3 @@ Verify a credential by its unique identifier, which can be either its UUID or it
 
 - The endpoint first attempts to find a credential by id. If not found, it checks if the id is an alias and resolves it to the credential's UUID.
 - If neither is found, a 404 error is returned.
-- The verification result is cached locally with an expiration time of 1 hour.
