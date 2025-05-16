@@ -1,7 +1,18 @@
 import { storage } from '#imports';
+import { onMessage } from '../src/messaging';
+
+// session cache of crdbl verification results
+const cache = new Map<string, boolean>();
 
 export default defineBackground(() => {
   console.log('Hello background!', { id: browser.runtime.id });
+
+  onMessage('getCrdblVerification', (msg) => {
+    const uuids = msg.data;
+    return Object.fromEntries(
+      uuids.map((u: string) => [u, cache.get(u) ?? false])
+    );
+  });
 
   // Add context menu items for side panel
   browser.contextMenus.create({
