@@ -1,8 +1,8 @@
 import { FastifyPluginAsync } from 'fastify';
 import { customAlphabet } from 'nanoid';
 import { nolookalikesSafe } from 'nanoid-dictionary';
-import { issueCredential } from '../services/cheqd-studio.js';
 import { CrdblCredentialIssueRequest, verifyHolderDid } from '@crdbl/utils';
+import { issueCredential, verifyCredential } from '../services/cheqd-studio.js';
 import db from '../services/db.js';
 
 const nanoid = (length = 10): string =>
@@ -82,6 +82,35 @@ const credential: FastifyPluginAsync = async (
       if (!cred)
         return reply.status(404).send({ error: 'Credential not found' });
       return cred;
+    } catch (error: any) {
+      fastify.log.error(error);
+      return reply
+        .status(500)
+        .send({ error: error.message || 'Internal server error' });
+    }
+  });
+
+  // Verify a credential by its id or alias
+  fastify.get('/credential/verify/:id', async function (request, reply) {
+    const { id } = request.params as { id: string };
+    if (!id) return reply.status(400).send({ error: 'Missing identifier' });
+
+    try {
+      const cred = await db.getCred(id);
+      if (!cred)
+        return reply.status(404).send({ error: 'Credential not found' });
+
+      // Check if the verification result is already cached
+      let verif = await db.getVerification(id);
+      if (verif) return verif;
+
+      // Verify the credential using cheqd-studio
+      verif = await verifyCredential(cred.proof.jwt);
+
+      // Cache the verification result
+      await db.setVerification(id, verif);
+
+      return verif;
     } catch (error: any) {
       fastify.log.error(error);
       return reply

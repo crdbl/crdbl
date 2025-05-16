@@ -102,3 +102,30 @@ Retrieve a credential by its unique identifier, which can be either its UUID or 
 
 - The endpoint first attempts to find a credential by id. If not found, it checks if the id is an alias and resolves it to the credential's UUID.
 - If neither is found, a 404 error is returned.
+
+## /credential/verify/:id
+
+**GET** `/credential/verify/:id`
+
+Verify a credential by its unique identifier, which can be either its UUID or its alias.
+
+### Path Parameter
+
+- `id` (string, required): The credential's unique identifier or alias.
+
+### Response
+
+- On success: The verification result object.
+- On error: `{ error: string }` with appropriate status code.
+
+### Error Cases
+
+- `400 Bad Request`: If the identifier is missing.
+- `404 Not Found`: If no credential is found for the given id or alias.
+- `500 Internal Server Error`: If there is a server or data parsing error.
+
+### Notes
+
+- The endpoint first attempts to find a credential by id. If not found, it checks if the id is an alias and resolves it to the credential's UUID.
+- If neither is found, a 404 error is returned.
+- The verification result is cached locally with an expiration time of 1 hour.

@@ -3,6 +3,7 @@ const config = {
   CHEQD_NETWORK: process.env.CHEQD_NETWORK ?? 'testnet',
   CHEQD_STUDIO_URL:
     process.env.CHEQD_STUDIO_URL ?? 'https://studio-api.cheqd.net',
+  REDIS_CACHE_TTL: 60 * 10, // cache some query results
   REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
 
   // secrets
@@ -25,5 +26,10 @@ if (missing.length > 0) {
 
 export default config;
 
-export const { CHEQD_HEADERS, CHEQD_NETWORK, CHEQD_STUDIO_URL, REDIS_URL } =
-  config;
+export const {
+  CHEQD_HEADERS,
+  CHEQD_NETWORK,
+  CHEQD_STUDIO_URL,
+  REDIS_CACHE_TTL,
+  REDIS_URL,
+} = config;

@@ -1,6 +1,10 @@
 import { createClient } from 'redis';
-import { REDIS_URL } from '../config.js';
-import { CrdblCredential, CreateDidResponse } from '@crdbl/utils';
+import { REDIS_CACHE_TTL, REDIS_URL } from '../config.js';
+import {
+  CrdblCredential,
+  CreateDidResponse,
+  CredentialVerification,
+} from '@crdbl/utils';
 
 /*
  * These functions read/write to Redis.
@@ -75,13 +79,36 @@ export const getCredsByHolder = async (
   return credentials.filter(Boolean);
 };
 
+export const setVerification = async (
+  id: string,
+  verification: CredentialVerification
+) => {
+  if (!redis.isOpen) await redis.connect();
+
+  // cache the verification
+  await redis.set(`verification:${id}`, JSON.stringify(verification), {
+    expiration: { type: 'EX', value: REDIS_CACHE_TTL },
+  });
+};
+
+export const getVerification = async (
+  id: string
+): Promise<CredentialVerification | null> => {
+  if (!redis.isOpen) await redis.connect();
+  const v = await redis.get(`verification:${id}`);
+  if (!v) return null;
+  return JSON.parse(v) as CredentialVerification;
+};
+
 const db = {
   redis,
   getCred,
   getCredsByHolder,
   getIssuer,
+  getVerification,
   setCred,
   setIssuer,
+  setVerification,
 };
 
 export default db;
