@@ -106,6 +106,68 @@ See `apps/api/src/routes/README.md` for full API documentation.
 
 **crdbl** is building the trust layer for the credible web—where every claim, dataset, or AI output can be independently verified, with full provenance and context.
 
+---
+
+## Developer Setup
+
+To get started running the application locally, follow these steps:
+
+### 1. Environment Variables
+
+Each app requires its own `.env` file. Use the provided example files as templates:
+
+- **API**: Copy `apps/api/env.dev.example` to `apps/api/.env.dev` and fill in the required secrets (e.g., `CHEQD_API_KEY`, `OPENAI_API_KEY`).
+- **Web Extension**: Copy `apps/ext/env.example` to `apps/ext/.env` and set the `VITE_API_URL` as needed.
+
+> **Tip:** Never commit your `.env` files. They are git-ignored by default.
+
+### 2. Start Redis (Required for API)
+
+Start Redis using the Nx infrastructure project, which uses Docker Compose:
+
+```sh
+nx run infra:up
+```
+
+This will launch a Redis instance. (You can stop it with `nx run infra:down`.)
+
+### 3. Start All Apps for Local Development
+
+You can run the API, web extension (with HMR), and website together using Nx:
+
+```sh
+nx run-many --target=dev --all --outputStyle=dynamic-legacy
+```
+
+- **API**: Runs the backend server (Fastify) with live reload.
+- **Web Extension**: Runs the extension in HMR (Hot Module Replacement) mode using [WXT](https://wxt.dev/), which will launch a Chromium browser for live extension development.
+- **Website**: Runs the web frontend for testing and development.
+
+> **Note:** WXT's dev mode is tested and known to work with Chromium-based browsers. Compatibility with all major browsers (Chrome, Firefox, Edge, Safari) is a mindful target. See the [WXT docs](https://wxt.dev/) for more details on browser support and HMR features.
+
+### 4. Nx Targets for Quality and CI
+
+- **Lint:**
+  ```sh
+  nx lint
+  ```
+- **Test:**
+  ```sh
+  nx test
+  ```
+- **Build:**
+  ```sh
+  nx build
+  ```
+- **Format (required for CI):**
+  ```sh
+  nx format:check
+  ```
+
+> **CI** requires all code to pass formatting (`nx format:check`), linting, tests, and build steps. See `.github/workflows/ci.yml` for details.
+
+---
+
 <details>
 
 <summary>Nx Workspace</summary>
