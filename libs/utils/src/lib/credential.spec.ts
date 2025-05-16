@@ -13,7 +13,12 @@ describe('credential utils', () => {
     const valid = await verifyHolderDid(did, content, context, signature);
     expect(valid).toBe(true);
     // Tampered content should fail
-    const invalid = await verifyHolderDid(did, 'goodbye world', context, signature);
+    const invalid = await verifyHolderDid(
+      did,
+      'goodbye world',
+      context,
+      signature
+    );
     expect(invalid).toBe(false);
   });
 
@@ -25,10 +30,20 @@ describe('credential utils', () => {
     const valid = await verifyHolderDid(did, content, context, signature);
     expect(valid).toBe(true);
     // Tampered content should fail
-    const invalidContent = await verifyHolderDid(did, 'goodbye world', context, signature);
+    const invalidContent = await verifyHolderDid(
+      did,
+      'goodbye world',
+      context,
+      signature
+    );
     expect(invalidContent).toBe(false);
     // Tampered context should fail
-    const invalidContext = await verifyHolderDid(did, content, ['ctx3'], signature);
+    const invalidContext = await verifyHolderDid(
+      did,
+      content,
+      ['ctx3'],
+      signature
+    );
     expect(invalidContext).toBe(false);
   });
 });
