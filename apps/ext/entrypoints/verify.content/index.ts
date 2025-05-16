@@ -52,5 +52,26 @@ export default defineContentScript({
     };
 
     await verifyCrdbls();
+
+    // Verify crdbls in HTML data-crdbl attributes
+    const verifyDataCrdbls = async () => {
+      const crdbls = new Set<string>();
+      const elems = document.querySelectorAll('[data-crdbl]');
+
+      elems.forEach((el) => {
+        const id = el.getAttribute('data-crdbl');
+        if (id) crdbls.add(id);
+      });
+
+      const verified = await sendMessage('getCrdblVerification', [...crdbls]);
+      console.log('verified-data', verified);
+
+      elems.forEach((el) => {
+        const id = el.getAttribute('data-crdbl');
+        if (!id) return;
+        el.classList.add(verified[id] ? 'crdbl-checked' : 'crdbl-warning');
+      });
+    };
+    await verifyDataCrdbls();
   },
 });
