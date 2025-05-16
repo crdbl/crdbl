@@ -172,131 +172,119 @@ function App() {
       </div>
 
       {/* API Status Indicator */}
-      <div className="card card-border bg-base-200 mb-4">
-        <div className="card-body">
-          <h2 className="card-title">API Status</h2>
-          <div className="flex items-center gap-2">
-            <div
-              className={`w-3 h-3 rounded-full ${
-                apiStatus === 'ok'
-                  ? 'bg-success'
-                  : apiStatus === 'error'
-                  ? 'bg-error'
-                  : 'bg-warning'
-              }`}
-            />
-            <span>
-              {apiStatus === 'ok'
-                ? 'Connected'
+      <div className="bg-base-200 border-base-300 rounded-box w-full border p-2 mt-4">
+        <div className="flex justify-center items-center gap-2">
+          <span>API Status:</span>
+          <div
+            className={`w-3 h-3 rounded-full ${
+              apiStatus === 'ok'
+                ? 'bg-success'
                 : apiStatus === 'error'
-                ? 'Disconnected'
-                : 'Checking...'}
-            </span>
+                ? 'bg-error'
+                : 'bg-warning'
+            }`}
+          />
+          <span>
+            {apiStatus === 'ok'
+              ? 'Connected'
+              : apiStatus === 'error'
+              ? 'Disconnected'
+              : 'Checking...'}
+          </span>
+        </div>
+      </div>
+
+      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+        <legend className="fieldset-legend">Decentralized identifier</legend>
+        {error && (
+          <div className="alert alert-error">
+            <span>{error}</span>
           </div>
-        </div>
-      </div>
-
-      <div className="card card-border bg-base-200 mt-4">
-        <div className="card-body">
-          <h2 className="card-title">DID Management</h2>
-          {error && (
-            <div className="alert alert-error">
-              <span>{error}</span>
-            </div>
-          )}
-          {isLoading ? (
-            <div className="flex justify-center">
-              <span className="loading loading-spinner loading-md"></span>
-            </div>
-          ) : did ? (
-            <div className="alert alert-success justify-center">
-              <span>{did}</span>
-            </div>
-          ) : (
-            <button
-              className="btn btn-primary"
-              onClick={handleCreateDid}
-              disabled={apiStatus !== 'ok'}
-            >
-              Create DID
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="card card-border bg-base-200 mt-4">
-        <div className="card-body">
-          <h2 className="card-title">Issue Credential</h2>
-          <form
-            onSubmit={handleIssueCredential}
-            className="flex flex-col gap-2"
+        )}
+        {isLoading ? (
+          <div className="flex justify-center">
+            <span className="loading loading-spinner loading-md"></span>
+          </div>
+        ) : did ? (
+          <div className="justify-center">
+            <span>{did}</span>
+          </div>
+        ) : (
+          <button
+            className="btn btn-primary"
+            onClick={handleCreateDid}
+            disabled={apiStatus !== 'ok'}
           >
-            <textarea
-              className="textarea textarea-bordered min-h-[120px] max-h-[300px] w-full resize-y"
-              placeholder="Credential content"
-              value={credentialContent}
-              onChange={(e) => setCredentialContent(e.target.value)}
-              disabled={!did || isIssuing}
-              required
-            />
-            <button
-              className="btn btn-primary"
-              type="submit"
-              disabled={!did || isIssuing || !credentialContent}
-            >
-              {isIssuing ? 'Issuing...' : 'Issue Credential'}
-            </button>
-          </form>
-        </div>
-      </div>
+            Create DID
+          </button>
+        )}
+      </fieldset>
 
-      <div className="card card-border bg-base-200 mt-4">
-        <div className="card-body">
-          <h2 className="card-title">Your Credentials</h2>
-          {credentials.length === 0 ? (
-            <div>No credentials found.</div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {credentials.map((cred, idx) => {
-                // Extract main info
-                const content =
-                  cred.credentialSubject?.alias ||
-                  cred.credentialSubject?.content ||
-                  '';
-                const issuanceDate = cred.issuanceDate || '';
-                // Hide proof.jwt for brevity in details
-                const details = { ...cred };
-                if (details.proof && details.proof.jwt) {
-                  details.proof = { ...details.proof, jwt: '[hidden]' };
-                }
-                return (
-                  <div
-                    className="collapse collapse-arrow bg-base-100"
-                    key={idx}
-                  >
-                    <input type="checkbox" />
-                    <div className="collapse-title font-medium flex flex-col gap-1">
-                      <span className="text-base font-semibold">
-                        {content || 'Credential'}
+      <form onSubmit={handleIssueCredential}>
+        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+          <legend className="fieldset-legend">Issue Crdbl Credential</legend>
+
+          <label className="label">Crdbl Content</label>
+          <textarea
+            className="textarea textarea-bordered min-h-[120px] max-h-[300px] w-full resize-y"
+            placeholder="Credential content"
+            value={credentialContent}
+            onChange={(e) => setCredentialContent(e.target.value)}
+            disabled={!did || isIssuing}
+            required
+          />
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={!did || isIssuing || !credentialContent}
+          >
+            {isIssuing ? 'Issuing...' : 'Issue Credential'}
+          </button>
+        </fieldset>
+      </form>
+
+      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+        <legend className="fieldset-legend">My Crdbl Credentials</legend>
+        {credentials.length === 0 ? (
+          <div>No credentials found.</div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {credentials.map((cred, idx) => {
+              // Extract main info
+              const content =
+                cred.credentialSubject?.alias ||
+                cred.credentialSubject?.content ||
+                '';
+              const issuanceDate = cred.issuanceDate || '';
+              // Hide proof.jwt for brevity in details
+              const details = { ...cred };
+              if (details.proof && details.proof.jwt) {
+                details.proof = { ...details.proof, jwt: '[hidden]' };
+              }
+              return (
+                <div className="collapse collapse-arrow bg-base-100" key={idx}>
+                  <input type="checkbox" />
+                  <div className="collapse-title font-medium flex flex-col gap-1">
+                    <span className="text-base font-semibold">
+                      {content || 'Credential'}
+                    </span>
+                    {issuanceDate && (
+                      <span className="text-xs text-gray-500">
+                        Issued: {new Date(issuanceDate).toLocaleString()}
                       </span>
-                      {issuanceDate && (
-                        <span className="text-xs text-gray-500">
-                          Issued: {new Date(issuanceDate).toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                    <div className="collapse-content">
-                      <pre className="text-xs text-left whitespace-pre-wrap break-all bg-base-300 p-2 rounded-xl">
-                        {JSON.stringify(details, null, 2)}
-                      </pre>
-                    </div>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
+                  <div className="collapse-content">
+                    <pre className="text-xs text-left whitespace-pre-wrap break-all bg-base-300 p-2 rounded-xl">
+                      {JSON.stringify(details, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </fieldset>
     </>
   );
 }
