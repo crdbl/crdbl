@@ -1,6 +1,6 @@
+import { CreateDidResponse } from '@crdbl/utils';
 import { createClient } from 'redis';
 import { createDid } from './services/cheqd-studio.js';
-import { CreateDidResponse } from './types.js';
 import { REDIS_URL } from './config.js';
 
 const redis = createClient({ url: REDIS_URL });

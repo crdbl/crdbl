@@ -1,10 +1,10 @@
-import { CrdblCredentialAttributes } from '@crdbl/utils';
 import { CHEQD_HEADERS, CHEQD_NETWORK, CHEQD_STUDIO_URL } from '../config.js';
 import {
+  CrdblCredential,
+  CrdblCredentialAttributes,
   CreateDidResponse,
-  CredentialIssueResponse,
-  CredentialVerifyResponse,
-} from '../types.js';
+  CredentialVerification,
+} from '@crdbl/utils';
 
 export async function createDid() {
   const r = await fetch(`${CHEQD_STUDIO_URL}/did/create`, {
@@ -40,7 +40,7 @@ export async function issueCredential(x: {
     }),
   });
   if (!r.ok) throw new Error(await r.text());
-  return (await r.json()) as CredentialIssueResponse;
+  return (await r.json()) as CrdblCredential;
 }
 
 export async function verifyCredential(jwt: string) {
@@ -52,5 +52,5 @@ export async function verifyCredential(jwt: string) {
     }),
   });
   if (!r.ok) throw new Error(await r.text());
-  return (await r.json()) as CredentialVerifyResponse;
+  return (await r.json()) as CredentialVerification;
 }
