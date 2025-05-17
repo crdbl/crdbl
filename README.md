@@ -146,13 +146,15 @@ Each app requires its own `.env` file. Use the provided example files as templat
 
 ### 2. Start Redis (Required for API)
 
-Start Redis using the Nx infrastructure project, which uses Docker Compose:
+Redis is used for both persistent storage and cache. Start Redis using the Nx infrastructure project, which uses Docker Compose:
 
 ```sh
 nx run infra:up
 ```
 
 This will launch a Redis instance. (You can stop it with `nx run infra:down`.)
+
+(Alternatively, execute docker-compose directly.)
 
 ### 3. Start All Apps for Local Development
 
@@ -163,12 +165,22 @@ nx run-many --target=dev --all --outputStyle=dynamic-legacy
 ```
 
 - **API**: Runs on [http://localhost:3001](http://localhost:3001)
-- **Web**: Runs on [http://localhost:3002](http://localhost:3002) — a simple site for testing crdbl inline content and verification.
+- **Web**: Runs on [http://localhost:3002](http://localhost:3002) — a simple site for testing crdbl inline content and verification display.
 - **Web Extension**: Runs in HMR mode using [WXT](https://wxt.dev/), launching a Chromium browser for live extension development.
 
 > **Note:** WXT's dev mode is tested and known to work with Chromium-based browsers. Compatibility with all major browsers (Chrome, Firefox, Edge, Safari) is a mindful target. See the [WXT docs](https://wxt.dev/) for more details on browser support and HMR features.
 
-### 4. Nx Targets for Quality and CI
+### 4. Bootstrap the Issuer DID (Required for API)
+
+With the API and Redis (DB) running, you must bootstrap the issuer DID before issuing credentials. Run the following command:
+
+```sh
+nx run @crdbl/api:bootstrap
+```
+
+This will create and store the issuer DID in Redis persistent storage.
+
+### 5. Nx Targets for Quality and CI
 
 - Lint: `nx run-many -t lint --all`
 - Test: `nx run-many -t test --all`
