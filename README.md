@@ -74,8 +74,6 @@
 - **Monetization**:
   Content creators can be paid when others reference their crdbls in new credentials. AI verification costs are covered by credential issuance fees.
 
----
-
 ## Quick Start
 
 1. Install the browser extension and create your DID.
@@ -83,7 +81,38 @@
 3. Reference other crdbls for context to build compositional trust.
 4. Use the extension or API to verify content anywhere on the web.
 
----
+## Browser Extension Features
+
+The web browser extension provides:
+
+- **Popup**: Quick access to your crdbls and actions.
+- **Sidepanel**: View and manage crdbls alongside web content.
+- **Right-click**: Select text and use the context menu to create a crdbl for the selection.
+- **View all crdbls**: See all crdbls registered with your DID.
+- **In-line verification**: The extension scans web pages for embedded crdbls and displays an icon next to content, indicating if it is verified (pass/fail) and by whom.
+
+## Including crdbls in Web Content
+
+Each crdbl has a unique identifier and optionally a more compact alias.
+
+There are two ways to include crdbls in web pages using its alias or uuid, for example:
+
+1. **HTML Attribute** (recommended):
+   ```html
+   <span data-crdbl="xfJQRF9Jdr">This is credible content.</span>
+   ```
+2. **Simple Reference** (developing):
+   ```html
+   This is credible content. crdbl:xfJQRF9Jdr
+   ```
+
+The browser extension will automatically detect and verify these crdbls, showing an icon if the claim passes or fails verification.
+
+## DID Ownership
+
+- Each user or AI Agent creates a DID, which gets issued their crdbls.
+- Users and AI can synthesize new crdbls by referencing others, they're only issued if the content checks out (by AI) as credible within the given context. This allows for dynamic remix's of content, and different sentence structure while still maintaing verifiable credibility.
+- In addition to web app, and browser extension, an SDK is planned to enable both humans and AI to interface with the system.
 
 ## API Endpoints
 
@@ -94,30 +123,24 @@
 
 See `apps/api/src/routes/README.md` for full API documentation.
 
----
-
 ## Learn More
 
 - [cheqd Network](https://cheqd.io/)
 - [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/)
 - [Decentralized Identifiers (DIDs)](https://www.w3.org/TR/did-core/)
 
----
-
 **crdbl** is building the trust layer for the credible web—where every claim, dataset, or AI output can be independently verified, with full provenance and context.
-
----
 
 ## Developer Setup
 
-To get started running the application locally, follow these steps:
+To get started running the application locally:
 
 ### 1. Environment Variables
 
 Each app requires its own `.env` file. Use the provided example files as templates:
 
-- **API**: Copy `apps/api/env.dev.example` to `apps/api/.env.dev` and fill in the required secrets (e.g., `CHEQD_API_KEY`, `OPENAI_API_KEY`).
-- **Web Extension**: Copy `apps/ext/env.example` to `apps/ext/.env` and set the `VITE_API_URL` as needed.
+- **API**: Copy [`apps/api/env.dev.example`](apps/api/env.dev.example) to `apps/api/.env.dev` and fill in the required secrets (e.g., `CHEQD_API_KEY`, `OPENAI_API_KEY`).
+- **Web Extension**: Copy [`apps/ext/env.example`](apps/ext/env.example) to `apps/ext/.env` and set the `VITE_API_URL` as needed.
 
 > **Tip:** Never commit your `.env` files. They are git-ignored by default.
 
@@ -139,9 +162,9 @@ You can run the API, web extension (with HMR), and website together using Nx:
 nx run-many --target=dev --all --outputStyle=dynamic-legacy
 ```
 
-- **API**: Runs the backend server (Fastify) with live reload.
-- **Web Extension**: Runs the extension in HMR (Hot Module Replacement) mode using [WXT](https://wxt.dev/), which will launch a Chromium browser for live extension development.
-- **Website**: Runs the web frontend for testing and development.
+- **API**: Runs on [http://localhost:3001](http://localhost:3001)
+- **Web**: Runs on [http://localhost:3002](http://localhost:3002) — a simple site for testing crdbl inline content and verification.
+- **Web Extension**: Runs in HMR mode using [WXT](https://wxt.dev/), launching a Chromium browser for live extension development.
 
 > **Note:** WXT's dev mode is tested and known to work with Chromium-based browsers. Compatibility with all major browsers (Chrome, Firefox, Edge, Safari) is a mindful target. See the [WXT docs](https://wxt.dev/) for more details on browser support and HMR features.
 
@@ -164,7 +187,7 @@ nx run-many --target=dev --all --outputStyle=dynamic-legacy
   nx format:check
   ```
 
-> **CI** requires all code to pass formatting (`nx format:check`), linting, tests, and build steps. See `.github/workflows/ci.yml` for details.
+> **CI** requires all code to pass formatting (`nx format:check`), linting, tests, and build steps. See [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for details.
 
 ---
 
