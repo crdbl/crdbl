@@ -121,7 +121,7 @@ The browser extension will automatically detect and verify these crdbls, showing
 - `GET /credential/:id` — Retrieve a credential by ID or alias.
 - `GET /credential/verify/:id` — Verify a credential and its context.
 
-See `apps/api/src/routes/README.md` for full API documentation.
+See [`apps/api/src/routes/README.md`](apps/api/src/routes/README.md) for full API documentation.
 
 ## Learn More
 
@@ -170,24 +170,33 @@ nx run-many --target=dev --all --outputStyle=dynamic-legacy
 
 ### 4. Nx Targets for Quality and CI
 
-- **Lint:**
-  ```sh
-  nx lint
-  ```
-- **Test:**
-  ```sh
-  nx test
-  ```
-- **Build:**
-  ```sh
-  nx build
-  ```
-- **Format (required for CI):**
-  ```sh
-  nx format:check
-  ```
+- Lint: `nx run-many -t lint --all`
+- Test: `nx run-many -t test --all`
+- Build: `nx run-many -t build --all`
+- Format: `nx format:check`
 
-> **CI** requires all code to pass formatting (`nx format:check`), linting, tests, and build steps. See [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for details.
+> **CI** requires all code to pass formatting, linting, tests, and build steps. See [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for details.
+
+### Notable Files
+
+- API (Backend)
+  - [`apps/api/src/routes/credential.ts`](apps/api/src/routes/credential.ts): Main credential API endpoints (issue, list, retrieve, verify) and context/AI checks.
+  - [`apps/api/src/services/ai.ts`](apps/api/src/services/ai.ts): Handles AI-powered context verification (contradiction detection).
+  - [`apps/api/src/services/cheqd-studio.ts`](apps/api/src/services/cheqd-studio.ts): Integrates with cheqd Studio for DID and credential issuance/verification.
+  - [`apps/api/src/services/db.ts`](apps/api/src/services/db.ts): Redis-based storage for credentials, verifications, and issuer info.
+  - [`apps/api/src/app.ts`](apps/api/src/app.ts): Fastify app setup, autoloads plugins and routes.
+  - [`apps/api/src/config.ts`](apps/api/src/config.ts): Loads and validates environment variables and config for the API.
+  - [`apps/api/src/bootstrap.ts`](apps/api/src/bootstrap.ts): Script to create and store the issuer DID in Redis.
+- Browser Extension
+  - [`apps/ext/entrypoints/background.ts`](apps/ext/entrypoints/background.ts): Background worker for extension, handles verification requests and context menu actions.
+  - [`apps/ext/entrypoints/popup/App.tsx`](apps/ext/entrypoints/popup/App.tsx): Main UI for the extension popup (DID creation, credential issuance, credential list).
+  - [`apps/ext/entrypoints/verify.content/index.ts`](apps/ext/entrypoints/verify.content/index.ts): Content script that scans web pages for crdbls and annotates them with verification status.
+  - [`apps/ext/entrypoints/sidepanel/App.tsx`](apps/ext/entrypoints/sidepanel/App.tsx): Sidepanel UI (re-exports popup UI).
+- Web (Demo Site)
+  - [`apps/web/src/App.tsx`](apps/web/src/App.tsx): Minimal demo site for testing inline crdbl content and verification display.
+- Utils (Shared Library)
+  - [`libs/utils/src/lib/credential.ts`](libs/utils/src/lib/credential.ts): Core logic for DID creation, signing, and signature verification for credentials.
+  - [`libs/utils/src/lib/types.ts`](libs/utils/src/lib/types.ts): Shared TypeScript types for credentials, DIDs, and API payloads.
 
 ---
 
