@@ -16,7 +16,7 @@ Output rules
 Respond ONLY with the single digit 1, 0, or 3 — no other text.
 `;
 
-export async function evaluateContent(
+async function evaluateContent(
   claim: string,
   context: string[]
 ): Promise<0 | 1 | 3> {
@@ -56,7 +56,7 @@ export interface ChatCompletionResponse {
   // TODO: add `usage` etc. later if needed
 }
 
-export async function chat(messages: any[]) {
+async function chat(messages: any[]) {
   const payload = {
     model: AI_MODEL,
     temperature: AI_TEMPERATURE,
@@ -75,3 +75,7 @@ export async function chat(messages: any[]) {
   if (!res.ok) throw new Error(`AI ${res.status} ${await res.text()}`);
   return (await res.json()) as ChatCompletionResponse;
 }
+
+export default {
+  evaluateContent,
+};

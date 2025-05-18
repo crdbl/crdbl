@@ -3,8 +3,8 @@ import { customAlphabet } from 'nanoid';
 import { nolookalikesSafe } from 'nanoid-dictionary';
 import { CrdblCredentialIssueRequest, verifyHolderDid } from '@crdbl/utils';
 import { issueCredential, verifyCredential } from '../services/cheqd-studio.js';
+import ai from '../services/ai.js';
 import db from '../services/db.js';
-import { evaluateContent } from '../services/ai.js';
 
 const nanoid = (length = 10): string =>
   customAlphabet(nolookalikesSafe, length)();
@@ -74,7 +74,7 @@ const credential: FastifyPluginAsync = async (
 
       // if there is context, evaulate new content as cliams within context
       if (context.length > 0) {
-        const credible = await evaluateContent(attributes.content, context);
+        const credible = await ai.evaluateContent(attributes.content, context);
         console.log('AI eval', credible);
         // NOTE: don't worry about ambiguous (3) for now
         if (credible === 0)
