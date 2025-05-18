@@ -14,6 +14,15 @@ import {
 
 const redis = createClient({ url: REDIS_URL });
 
+const health = async () => {
+  try {
+    if (!redis.isOpen) await redis.connect();
+    await redis.ping();
+  } catch (error) {
+    throw new Error('redis connection failed');
+  }
+};
+
 const getIssuer = async (): Promise<CreateDidResponse | null> => {
   if (!redis.isOpen) await redis.connect();
 
@@ -106,6 +115,7 @@ export default {
   getCredsByHolder,
   getIssuer,
   getVerification,
+  health,
   setCred,
   setIssuer,
   setVerification,
