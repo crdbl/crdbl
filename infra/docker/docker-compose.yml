@@ -29,3 +29,27 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+
+  api:
+    image: 'crdbl/api:latest'
+    profiles: ['production']
+    build:
+      context: ../..
+      dockerfile: ./apps/api/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../../apps/api/.env
+    environment:
+      NODE_ENV: production
+      IPFS_URL: 'http://ipfs:5001'
+      REDIS_URL: 'redis://redis:6379'
+    ports:
+      - 3001:3001
+    depends_on:
+      redis: { condition: service_healthy }
+      ipfs: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
