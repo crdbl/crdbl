@@ -38,9 +38,23 @@ const credential: FastifyPluginAsync = async (
       return reply.status(400).send({ error: 'Missing required fields' });
     }
     try {
-      const context = []; // all referenced context
+      const issuer = await db.getIssuer();
+      if (!issuer)
+        return reply.status(500).send({ error: 'Issuer DID not found' });
+
+      // ensure authentication of the subject DID
+      const valid = await verifyHolderDid(
+        subjectDid,
+        attributes.content,
+        attributes.context,
+        signature
+      );
+      if (!valid) return reply.status(401).send({ error: 'Invalid signature' });
+
+      console.log('attributes', attributes);
 
       // Check all context crdbls exist and are verified
+      const context = []; // all referenced context
       for (const ctxId of attributes.context) {
         const { cred: ctxCred, verif: ctxVerif } = await getOrVerifyCredential(
           ctxId
@@ -58,19 +72,7 @@ const credential: FastifyPluginAsync = async (
         context.push(ctxCred.credentialSubject.content);
       }
 
-      const issuer = await db.getIssuer();
-      if (!issuer)
-        return reply.status(500).send({ error: 'Issuer DID not found' });
-
-      const valid = await verifyHolderDid(
-        subjectDid,
-        attributes.content,
-        attributes.context,
-        signature
-      );
-      if (!valid) return reply.status(401).send({ error: 'Invalid signature' });
-
-      // evaulate content as cliams within context
+      // if there is context, evaulate new content as cliams within context
       if (context.length > 0) {
         const credible = await evaluateContent(attributes.content, context);
         console.log('AI eval', credible);
