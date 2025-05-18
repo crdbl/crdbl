@@ -14,6 +14,7 @@ const config = {
   // secrets
   CHEQD_API_KEY: process.env.CHEQD_API_KEY,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  PINATA_JWT: process.env.PINATA_JWT, // Pinata NOTE: "PAID_FEATURE_ONLY": "You must be on a paid plan to pin by CID"
 };
 
 config.CHEQD_HEADERS = {
@@ -41,6 +42,7 @@ export const {
   CHEQD_STUDIO_URL,
   IPFS_URL,
   OPENAI_API_KEY,
+  PINATA_JWT,
   REDIS_CACHE_TTL,
   REDIS_URL,
 } = config;
