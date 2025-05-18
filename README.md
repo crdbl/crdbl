@@ -7,6 +7,9 @@
 - **Content Credentials & Provenance**:
   Any chunk of content (text, data, code, etc.) can be turned into a verifiable credential (VC) with a decentralized identifier (DID) as its subject. These credentials can reference other credentials, enabling recursive, compositional trust and supporting complex, verifiable datasets.
 
+- **Decentralized Content Storage (IPFS)**:
+  All crdbl content is stored on [IPFS](https://ipfs.tech/), a decentralized storage network. Credentials reference the IPFS CID (Content Identifier) of the content, ensuring tamper-evidence and global retrievability.
+
 - **AI-Powered Context Verification**:
   When issuing a new credential, referenced credentials (the "context") are recursively fetched and verified. An AI model (e.g., OpenAI GPT) checks that the new claim does not contradict its referenced context, ensuring that composed claims are valid and trustworthy.
 
@@ -34,11 +37,13 @@
    - The user selects content and (optionally) references other crdbls as context.
    - The extension signs the content and context with the user's DID.
    - The backend verifies referenced credentials, then uses AI to check that the new claim is consistent with its context.
+   - **The content is uploaded to IPFS, and the credential references the resulting CID.**
    - If valid, a new VC is issued (using cheqd's network for decentralized trust) and stored.
 
 3. **Verification**:
    - Anyone can verify a credential (and its context) via the API or browser extension.
    - The extension annotates content in the browser, showing which claims are verified and by whom.
+   - **Content is fetched from IPFS using the referenced CID for verification and display.**
 
 ## Why cheqd?
 
@@ -139,20 +144,23 @@ To get started running the application locally:
 
 Each app requires its own `.env` file. Use the provided example files as templates:
 
-- **API**: Copy [`apps/api/env.dev.example`](apps/api/env.dev.example) to `apps/api/.env.dev` and fill in the required secrets (e.g., `CHEQD_API_KEY`, `OPENAI_API_KEY`).
+- **API**: Copy [`apps/api/env.dev.example`](apps/api/env.dev.example) to `apps/api/.env.dev` and fill in the required secrets (`CHEQD_API_KEY`, `OPENAI_API_KEY`) and optional settings.
 - **Web Extension**: Copy [`apps/ext/env.example`](apps/ext/env.example) to `apps/ext/.env` and set the `VITE_API_URL` as needed.
 
 > **Tip:** Never commit your `.env` files. They are git-ignored by default.
 
-### 2. Start Redis (Required for API)
+### 2. Start Redis and IPFS (Required for API)
 
-Redis is used for both persistent storage and cache. Start Redis using the Nx infrastructure project, which uses Docker Compose:
+Redis is used for both persistent storage and cache. IPFS is used for decentralized content storage. Optionally, IPFS content can also be remote pinned to [Pinata](https://www.pinata.cloud/). Start the local services using the Nx infrastructure project, which uses Docker Compose:
 
 ```sh
 nx run infra:up
 ```
 
-This will launch a Redis instance. (You can stop it with `nx run infra:down`.)
+This will launch both a Redis and an IPFS instance. (You can stop them with `nx run infra:down`.)
+
+- Redis runs on port 6379.
+- IPFS API runs on port 5001, Gateway on 8080.
 
 (Alternatively, execute docker-compose directly.)
 
@@ -193,6 +201,7 @@ This will create and store the issuer DID in Redis persistent storage.
 
 - API (Backend)
   - [`apps/api/src/routes/credential.ts`](apps/api/src/routes/credential.ts): Main credential API endpoints (issue, list, retrieve, verify) and context/AI checks.
+  - [`apps/api/src/services/ipfs.ts`](apps/api/src/services/ipfs.ts): IPFS integration for uploading and fetching content.
   - [`apps/api/src/services/ai.ts`](apps/api/src/services/ai.ts): Handles AI-powered context verification (contradiction detection).
   - [`apps/api/src/services/cheqd-studio.ts`](apps/api/src/services/cheqd-studio.ts): Integrates with cheqd Studio for DID and credential issuance/verification.
   - [`apps/api/src/services/db.ts`](apps/api/src/services/db.ts): Redis-based storage for credentials, verifications, and issuer info.
