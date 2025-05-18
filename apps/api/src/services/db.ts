@@ -14,7 +14,7 @@ import {
 
 const redis = createClient({ url: REDIS_URL });
 
-export const getIssuer = async (): Promise<CreateDidResponse | null> => {
+const getIssuer = async (): Promise<CreateDidResponse | null> => {
   if (!redis.isOpen) await redis.connect();
 
   const issuerRaw = await redis.get('issuer');
@@ -23,12 +23,12 @@ export const getIssuer = async (): Promise<CreateDidResponse | null> => {
   return JSON.parse(issuerRaw) as CreateDidResponse;
 };
 
-export const setIssuer = async (issuer: CreateDidResponse) => {
+const setIssuer = async (issuer: CreateDidResponse) => {
   if (!redis.isOpen) await redis.connect();
   await redis.set('issuer', JSON.stringify(issuer));
 };
 
-export const getCred = async (id: string): Promise<CrdblCredential | null> => {
+const getCred = async (id: string): Promise<CrdblCredential | null> => {
   if (!redis.isOpen) await redis.connect();
 
   // Try to get by id first, then try to resolve alias
@@ -42,7 +42,7 @@ export const getCred = async (id: string): Promise<CrdblCredential | null> => {
   return JSON.parse(credentialRaw) as CrdblCredential;
 };
 
-export const setCred = async (
+const setCred = async (
   id: string,
   credential: CrdblCredential,
   subjectDid: string // holder
@@ -61,7 +61,7 @@ export const setCred = async (
   await redis.sAdd(`holder:${subjectDid}`, id);
 };
 
-export const getCredsByHolder = async (
+const getCredsByHolder = async (
   holderDid: string
 ): Promise<(CrdblCredential | null)[]> => {
   if (!redis.isOpen) await redis.connect();
@@ -79,7 +79,7 @@ export const getCredsByHolder = async (
   return credentials.filter(Boolean);
 };
 
-export const setVerification = async (
+const setVerification = async (
   id: string,
   verification: CredentialVerification
 ) => {
@@ -91,7 +91,7 @@ export const setVerification = async (
   });
 };
 
-export const getVerification = async (
+const getVerification = async (
   id: string
 ): Promise<CredentialVerification | null> => {
   if (!redis.isOpen) await redis.connect();
@@ -100,7 +100,7 @@ export const getVerification = async (
   return JSON.parse(v) as CredentialVerification;
 };
 
-const db = {
+export default {
   redis,
   getCred,
   getCredsByHolder,
@@ -110,5 +110,3 @@ const db = {
   setIssuer,
   setVerification,
 };
-
-export default db;
