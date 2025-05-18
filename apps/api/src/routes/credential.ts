@@ -5,6 +5,7 @@ import { CrdblCredentialIssueRequest, verifyHolderDid } from '@crdbl/utils';
 import { issueCredential, verifyCredential } from '../services/cheqd-studio.js';
 import ai from '../services/ai.js';
 import db from '../services/db.js';
+import ipfs from '../services/ipfs.js';
 
 const nanoid = (length = 10): string =>
   customAlphabet(nolookalikesSafe, length)();
@@ -53,7 +54,7 @@ const credential: FastifyPluginAsync = async (
 
       console.log('attributes', attributes);
 
-      // Check all context crdbls exist and are verified
+      // Check all context crdbls exist and are verified with data in IPFS
       const context = []; // all referenced context
       for (const ctxId of attributes.context) {
         const { cred: ctxCred, verif: ctxVerif } = await getOrVerifyCredential(
@@ -69,7 +70,12 @@ const credential: FastifyPluginAsync = async (
             .status(400)
             .send({ error: `Context credential not verified: ${ctxId}` });
         }
-        context.push(ctxCred.credentialSubject.content);
+        const data = await ipfs.get(ctxCred.credentialSubject.content);
+        if (!data)
+          return reply
+            .status(400)
+            .send({ error: `Context credential not found in IPFS: ${ctxId}` });
+        context.push(data);
       }
 
       // if there is context, evaulate new content as cliams within context
@@ -86,12 +92,21 @@ const credential: FastifyPluginAsync = async (
       const alias = opts?.generateAlias ? nanoid() : undefined;
       const id = `urn:uuid:${crypto.randomUUID()}`;
 
+      // Upload content to IPFS and get CID
+      const cid = await ipfs.put(id, attributes.content);
+      console.log('IPFS CID', cid);
+      if (!cid)
+        return reply
+          .status(500)
+          .send({ error: 'Failed to upload content to IPFS' });
+
       const credential = await issueCredential({
         id,
         issuerDid: issuer.did,
         subjectDid,
         attributes: {
           ...attributes,
+          content: cid,
           alias,
         },
       });
