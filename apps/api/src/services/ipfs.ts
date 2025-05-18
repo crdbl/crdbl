@@ -4,6 +4,14 @@ import { IPFS_URL, PINATA_JWT } from '../config.js';
 // Connect to local IPFS node
 const ipfs = create({ url: IPFS_URL });
 
+const health = async () => {
+  try {
+    await ipfs.id({ timeout: 1_000 });
+  } catch (error) {
+    throw new Error('IPFS connection failed');
+  }
+};
+
 // If configured, add Pinata as a remote pinning service
 const setupRemotePinning = async () => {
   if (!PINATA_JWT) return;
@@ -63,6 +71,7 @@ const put = async (id: string, content: string) => {
 
 export default {
   ipfs,
+  health,
   get,
   put,
 };

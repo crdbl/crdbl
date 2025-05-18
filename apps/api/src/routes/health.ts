@@ -1,10 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
 import db from '../services/db.js';
+import ipfs from '../services/ipfs.js';
 
 const health: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
   fastify.get('/health', async function (_request, reply) {
     try {
-      await db.health();
+      await Promise.all([db.health(), ipfs.health()]);
       return { status: 'ok' };
     } catch (error) {
       fastify.log.error(error);
