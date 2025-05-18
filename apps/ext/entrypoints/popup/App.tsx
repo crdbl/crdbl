@@ -126,17 +126,22 @@ function App() {
       const stored = await holderDid.getValue();
       if (!stored) throw new Error('No holder DID found');
 
+      const context = credentialContext
+        .trim()
+        .split(/[\s,]+/)
+        .filter(Boolean); // remove ''
+
       const signature = await signWithHolderDid(
         stored.privateKey,
         credentialContent,
-        credentialContext.split(/[\s,]+/)
+        context
       );
 
       const req: CrdblCredentialIssueRequest = {
         subjectDid: stored.did,
         attributes: {
           content: credentialContent,
-          context: credentialContext.split(/[\s,]+/),
+          context,
         },
         signature,
         opts: {
