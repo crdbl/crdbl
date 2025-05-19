@@ -53,3 +53,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  web:
+    image: 'crdbl/web:latest'
+    profiles: ['production']
+    build:
+      context: ../..
+      dockerfile: ./apps/web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '3002:3002'
+    environment:
+      SERVER_LOG_LEVEL: 'info'
+      SERVER_PORT: 3002
