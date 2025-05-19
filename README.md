@@ -1,6 +1,8 @@
 # crdbl
 
-**crdbl** is an open-source platform for building a more credible web by enabling the creation, verification, and consumption of content credentials—verifiable credentials (VCs) that prove the provenance and veracity of both AI-generated and human-created content. It combines decentralized identity (DID), cryptographic signatures, and AI-powered context verification to establish trust in digital information.
+**crdbl**, powered by cheqd, provides trust infrastructure for a more credible web by transforming any human- or AI-generated content into a "crdbl"; a verifiable credential anchored to a decentralized identifier. When other crdbls are supplied as context, an AI engine recursively checks each new claim against the context, ensuring only credible credentials are issued thus weaving a composable, cryptographically linked graph of provenance where every assertion can be traced, proven, and marked as verifiably credible.
+
+A browser extension lets users mint, reference, and view verification status in-page, while an API offers AI agents programmatic issuance, access, deeper integrations, and independent verification. The result is a self-reinforcing web of trust that makes research, journalism, content ownership, synthetic compositions, and AI workflows instantly auditable, paving the way for a more credible internet with new monetization opportunities for content originators and synthesizers.
 
 ## Key Features
 
@@ -8,7 +10,7 @@
   Any chunk of content (text, data, code, etc.) can be turned into a verifiable credential (VC) with a decentralized identifier (DID) as its subject. These credentials can reference other credentials, enabling recursive, compositional trust and supporting complex, verifiable datasets.
 
 - **Decentralized Content Storage (IPFS)**:
-  All crdbl content is stored on [IPFS](https://ipfs.tech/), a decentralized storage network. Credentials reference the IPFS CID (Content Identifier) of the content, ensuring tamper-evidence and global retrievability.
+  All crdbl content is stored on IPFS, a decentralized storage network. Credentials reference the IPFS CID (Content Identifier) of the content, ensuring tamper-evidence and global retrievability.
 
 - **AI-Powered Context Verification**:
   When issuing a new credential, referenced credentials (the "context") are recursively fetched and verified. An AI model (e.g., OpenAI GPT) checks that the new claim does not contradict its referenced context, ensuring that composed claims are valid and trustworthy.
@@ -30,6 +32,7 @@
 ## How It Works
 
 1. **DID Creation**:
+
    Users (holders) generate a DID (using Ed25519 keys, fully in-browser for privacy) to represent their identity.
 
 2. **Issuing a Credential**:
@@ -37,10 +40,11 @@
    - The user selects content and (optionally) references other crdbls as context.
    - The extension signs the content and context with the user's DID.
    - The backend verifies referenced credentials, then uses AI to check that the new claim is consistent with its context.
-   - **The content is uploaded to IPFS, and the credential references the resulting CID.**
+   - The content is uploaded to IPFS, and the credential references the resulting CID.
    - If valid, a new VC is issued (using cheqd's network for decentralized trust) and stored.
 
 3. **Verification**:
+
    - Anyone can verify a credential (and its context) via the API or browser extension.
    - The extension annotates content in the browser, showing which claims are verified and by whom.
    - **Content is fetched from IPFS using the referenced CID for verification and display.**
