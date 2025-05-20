@@ -1,5 +1,5 @@
 import { createClient } from 'redis';
-import { REDIS_CACHE_TTL, REDIS_URL } from '../config.js';
+import { REDIS_CACHE_TTL, REDIS_PASSWORD, REDIS_URL } from '../config.js';
 import {
   CrdblCredential,
   CreateDidResponse,
@@ -12,7 +12,10 @@ import {
  * null is returned if the key is not found.
  */
 
-const redis = createClient({ url: REDIS_URL });
+const redis = createClient({
+  url: REDIS_URL,
+  ...(REDIS_PASSWORD ? { password: REDIS_PASSWORD } : {}),
+});
 
 const health = async () => {
   try {

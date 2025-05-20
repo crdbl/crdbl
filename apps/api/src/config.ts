@@ -9,6 +9,7 @@ const config = {
     process.env.CHEQD_STUDIO_URL ?? 'https://studio-api.cheqd.net',
   IPFS_URL: process.env.IPFS_URL ?? 'http://localhost:5001',
   REDIS_CACHE_TTL: 60 * 10, // cache some query results
+  REDIS_PASSWORD: process.env.REDIS_PASSWORD,
   REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
 
   // secrets
@@ -44,5 +45,6 @@ export const {
   OPENAI_API_KEY,
   PINATA_JWT,
   REDIS_CACHE_TTL,
+  REDIS_PASSWORD,
   REDIS_URL,
 } = config;
