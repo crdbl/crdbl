@@ -1,20 +1,16 @@
 services:
   redis:
     image: redis:8-alpine
-    restart: unless-stopped
+    container_name: crdbl-redis
     command: redis-server --appendonly yes # AOF persistence
     volumes:
       - ./data/redis:/data
-    ports: ['6379:6379']
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 5s
-      retries: 3
+    ports:
+      - '6379:6379'
 
   ipfs:
     image: ipfs/kubo:latest
-    restart: unless-stopped
+    container_name: crdbl-ipfs
     environment:
       IPFS_PROFILE: server
     volumes:
@@ -24,45 +20,3 @@ services:
       - '8080:8080' # Gateway
       - '4001:4001' # Swarm (tcp)
       - '4001:4001/udp'
-    healthcheck:
-      test: ['CMD', 'ipfs', 'id']
-      interval: 10s
-      timeout: 10s
-      retries: 5
-
-  api:
-    image: 'crdbl/api:latest'
-    profiles: ['production']
-    build:
-      context: ../..
-      dockerfile: ./apps/api/Dockerfile
-    restart: unless-stopped
-    env_file:
-      - ../../apps/api/.env
-    environment:
-      NODE_ENV: production
-      IPFS_URL: 'http://ipfs:5001'
-      REDIS_URL: 'redis://redis:6379'
-    ports:
-      - 3001:3001
-    depends_on:
-      redis: { condition: service_healthy }
-      ipfs: { condition: service_healthy }
-    healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/health']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  web:
-    image: 'crdbl/web:latest'
-    profiles: ['production']
-    build:
-      context: ../..
-      dockerfile: ./apps/web/Dockerfile
-    restart: unless-stopped
-    ports:
-      - '3002:3002'
-    environment:
-      SERVER_LOG_LEVEL: 'info'
-      SERVER_PORT: 3002
