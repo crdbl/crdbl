@@ -4,6 +4,7 @@ function App() {
   return (
     <div className="flex flex-col justify-center prose">
       <h2>Crdbl: Building the Credible Web</h2>
+      <img src="/crdbl.svg" className="logo scale-50" alt="Crdbl logo" />
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box border p-4 w-full">
         <legend className="fieldset-legend">embedded crdbl demo</legend>
         <div className="flex flex-col gap-4 prose">
