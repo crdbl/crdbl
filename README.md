@@ -110,12 +110,14 @@ There are two ways to include crdbls in web pages using its alias or uuid, for e
    ```html
    <span data-crdbl="xfJQRF9Jdr">This is credible content.</span>
    ```
-2. **Simple Reference** (developing):
+2. **Text Reference**:
    ```html
    This is credible content. crdbl:xfJQRF9Jdr
    ```
 
 The browser extension will automatically detect and verify these crdbls, showing an icon if the claim passes or fails verification.
+
+![extension verification](docs/extension-verification.png)
 
 ## DID Ownership
 
