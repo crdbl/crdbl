@@ -1,5 +1,5 @@
 {
-  "name": "infrastructure",
+  "name": "infra",
   "targets": {
     "up": {
       "executor": "nx:run-commands",
