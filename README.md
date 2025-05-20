@@ -155,18 +155,16 @@ Each app requires its own `.env` file. Use the provided example files as templat
 
 ### 2. Start Redis and IPFS (Required for API)
 
-Redis is used for both persistent storage and cache. IPFS is used for decentralized content storage. Optionally, IPFS content can also be remote pinned to [Pinata](https://www.pinata.cloud/). Start the local services using the Nx infrastructure project, which uses Docker Compose:
+Redis is used for both persistent storage and cache. IPFS is used for decentralized content storage. Optionally, IPFS content can also be remote pinned to [Pinata](https://www.pinata.cloud/). Start the local services using Docker Compose:
 
 ```sh
-nx run infra:up
+cd infra/docker; docker compose -f compose.dev.yml up -d
 ```
 
-This will launch both a Redis and an IPFS instance. (You can stop them with `nx run infra:down`.)
+This will launch both a Redis and an IPFS instance. (You can stop them with `docker compose -f compose.dev.yml down`.)
 
 - Redis runs on port 6379.
 - IPFS API runs on port 5001, Gateway on 8080.
-
-(Alternatively, execute docker-compose directly.)
 
 ### 3. Start All Apps for Local Development
 
