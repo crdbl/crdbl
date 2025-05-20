@@ -1,0 +1,12 @@
+{
+  "name": "@crdbl/assets",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "sync-assets": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bin/sync-assets.sh"
+      }
+    }
+  }
+}
