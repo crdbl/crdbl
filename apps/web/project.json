@@ -9,6 +9,9 @@
       "options": {
         "command": "prettier --check apps/web"
       }
+    },
+    "build": {
+      "dependsOn": ["@crdbl/assets:sync-assets"]
     }
   }
 }
