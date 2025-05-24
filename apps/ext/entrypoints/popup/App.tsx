@@ -9,6 +9,7 @@ import {
 import { storage } from '#imports';
 import { config } from '../../src/config';
 import './App.css';
+import { CredentialListItem } from '../../src/components/CredentialListItem';
 
 // local storage for the holder DID
 const holderDid = storage.defineItem<{
@@ -272,39 +273,9 @@ function App() {
           <div>No credentials found.</div>
         ) : (
           <div className="flex flex-col gap-2">
-            {credentials.map((cred, idx) => {
-              // Extract main info
-              const content =
-                cred.credentialSubject?.alias ||
-                cred.credentialSubject?.content ||
-                '';
-              const issuanceDate = cred.issuanceDate || '';
-              // Hide proof.jwt for brevity in details
-              const details = { ...cred };
-              if (details.proof && details.proof.jwt) {
-                details.proof = { ...details.proof, jwt: '[hidden]' };
-              }
-              return (
-                <div className="collapse collapse-arrow bg-base-100" key={idx}>
-                  <input type="checkbox" />
-                  <div className="collapse-title font-medium flex flex-col gap-1">
-                    <span className="text-base font-semibold">
-                      {content || 'Credential'}
-                    </span>
-                    {issuanceDate && (
-                      <span className="text-xs text-gray-500">
-                        Issued: {new Date(issuanceDate).toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="collapse-content">
-                    <pre className="text-xs text-left whitespace-pre-wrap break-all bg-base-300 p-2 rounded-xl">
-                      {JSON.stringify(details, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              );
-            })}
+            {credentials.map((cred) => (
+              <CredentialListItem key={cred.credentialSubject.id} cred={cred} />
+            ))}
           </div>
         )}
       </fieldset>
