@@ -25,6 +25,9 @@ services:
     volumes:
       - ./data/ipfs:/data/ipfs
     restart: unless-stopped
+    networks:
+      - default
+      - proxy
     expose:
       - '5001' # API
       - '8080' # Gateway
@@ -36,6 +39,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    labels:
+      caddy: ${HOSTNAME_IPFS}
+      caddy.encode: gzip zstd
+      caddy.reverse_proxy: '{{upstreams 8080}}'
 
   api:
     image: 'crdbl/api:latest'
