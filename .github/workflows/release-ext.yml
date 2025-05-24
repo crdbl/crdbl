@@ -31,7 +31,9 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
 
       - name: Write .env for wxt/vite
-        run: echo "VITE_API_URL=${{ vars.CRDBL_API_URL }}" >> apps/ext/.env
+        run: |
+          echo "VITE_API_URL=${{ vars.CRDBL_API_URL }}" >> apps/ext/.env
+          echo "VITE_IPFS_URL=${{ vars.CRDBL_IPFS_URL }}" >> apps/ext/.env
 
       - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/ext@}" >> $GITHUB_ENV
