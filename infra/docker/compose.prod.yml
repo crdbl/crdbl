@@ -36,6 +36,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    labels:
+      caddy: ${HOSTNAME_IPFS}
+      caddy.encode: gzip zstd
+      caddy.reverse_proxy: '{{upstreams 8080}}'
 
   api:
     image: 'crdbl/api:latest'
