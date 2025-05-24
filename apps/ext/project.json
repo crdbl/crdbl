@@ -4,6 +4,9 @@
   "projectType": "application",
   "tags": [],
   "targets": {
+    "build": {
+      "dependsOn": ["@crdbl/utils:build", "@crdbl/assets:sync-assets"]
+    },
     "format": {
       "executor": "nx:run-commands",
       "options": {

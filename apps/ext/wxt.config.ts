@@ -8,7 +8,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
 
   manifest: {
-    host_permissions: [`${config.API_URL}/*`],
+    host_permissions: [`${config.API_URL}/*`, `${config.IPFS_URL}/*`],
 
     permissions: ['storage', 'sidepanel', 'sidebar_action', 'contextMenus'],
   },

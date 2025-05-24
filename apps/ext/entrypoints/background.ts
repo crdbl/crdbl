@@ -1,7 +1,7 @@
-import { storage } from '#imports';
 import { CredentialVerification } from '@crdbl/utils';
 import { config } from '../src/config';
 import { onMessage } from '../src/messaging';
+import { selectedText } from '../src/storage';
 
 // session cache of crdbl verifications
 const cache = new Map<string, boolean>();
@@ -53,9 +53,6 @@ export default defineBackground(() => {
     title: 'Import Selected Text to Crdbl',
     contexts: ['selection'],
   });
-
-  // Define a storage item for selected text
-  const selectedText = storage.defineItem<string>('local:selectedText');
 
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (!tab) return;

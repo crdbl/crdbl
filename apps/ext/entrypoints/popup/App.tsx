@@ -1,23 +1,11 @@
 import { useState, useEffect } from 'react';
 import crdblLogo from '@/assets/crdbl.svg';
-import {
-  CrdblCredential,
-  CrdblCredentialIssueRequest,
-  createHolderDid,
-  signWithHolderDid,
-} from '@crdbl/utils';
-import { storage } from '#imports';
+import { CrdblCredential, createHolderDid } from '@crdbl/utils';
 import { config } from '../../src/config';
+import { holderDid } from '../../src/storage';
+import { CredentialIssueForm } from '../../src/components/CredentialIssueForm';
+import { CredentialListItem } from '../../src/components/CredentialListItem';
 import './App.css';
-
-// local storage for the holder DID
-const holderDid = storage.defineItem<{
-  did: string;
-  privateKey: string;
-}>('local:holderDid');
-
-// local storage item for selected text
-const selectedText = storage.defineItem<string>('local:selectedText');
 
 function App() {
   const [did, setDid] = useState<string | null>(null);
@@ -26,10 +14,7 @@ function App() {
   const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'checking'>(
     'checking'
   );
-  const [credentialContent, setCredentialContent] = useState('');
-  const [credentialContext, setCredentialContext] = useState('');
   const [credentials, setCredentials] = useState<CrdblCredential[]>([]);
-  const [isIssuing, setIsIssuing] = useState(false);
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -101,78 +86,9 @@ function App() {
     if (did) fetchCredentials(did);
   }, [did]);
 
-  // On mount, check and watch for selected text in storage
-  useEffect(() => {
-    selectedText.getValue().then((val) => {
-      if (val) setCredentialContent(val);
-    });
-
-    const unwatch = selectedText.watch((val) => {
-      if (val) setCredentialContent(val);
-    });
-
-    // cleanup
-    return () => {
-      unwatch();
-    };
-  }, []);
-
-  // Handler for credential issuance
-  const handleIssueCredential = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsIssuing(true);
-    setError(null);
-    try {
-      const stored = await holderDid.getValue();
-      if (!stored) throw new Error('No holder DID found');
-
-      const context = credentialContext
-        .trim()
-        .split(/[\s,]+/)
-        .filter(Boolean); // remove ''
-
-      const signature = await signWithHolderDid(
-        stored.privateKey,
-        credentialContent,
-        context
-      );
-
-      const req: CrdblCredentialIssueRequest = {
-        subjectDid: stored.did,
-        attributes: {
-          content: credentialContent,
-          context,
-        },
-        signature,
-        opts: {
-          generateAlias: true,
-        },
-      };
-      const res = await fetch(`${config.API_URL}/credential/issue`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req),
-      });
-      if (!res.ok) throw new Error(await res.text());
-
-      setCredentialContent('');
-      setCredentialContext('');
-      // Clear selected text from storage
-      selectedText.removeValue();
-      // Refresh credentials list
-      fetchCredentials(stored.did);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to issue credential'
-      );
-    } finally {
-      setIsIssuing(false);
-    }
-  };
-
   return (
     <>
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center">
         <img src={crdblLogo} className="logo" alt="Crdbl logo" />
         <div className="prose">
           <h1>crdbl</h1>
@@ -229,85 +145,30 @@ function App() {
         )}
       </fieldset>
 
-      <form onSubmit={handleIssueCredential}>
-        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
-          <legend className="fieldset-legend">Issue Crdbl Credential</legend>
-
-          <label className="label">Crdbl Content</label>
-          <textarea
-            className="textarea textarea-bordered min-h-[120px] max-h-[300px] w-full resize-y"
-            placeholder=""
-            value={credentialContent}
-            onChange={(e) => setCredentialContent(e.target.value)}
-            disabled={!did || isIssuing}
-            required
+      {did && (
+        <>
+          <CredentialIssueForm
+            disabled={isLoading || apiStatus !== 'ok'}
+            onIssued={() => fetchCredentials(did)}
           />
 
-          <label className="label">Crdbl Context</label>
-          <input
-            type="text"
-            className="input input-bordered w-full"
-            placeholder=""
-            value={credentialContext}
-            onChange={(e) => setCredentialContext(e.target.value)}
-            disabled={!did || isIssuing}
-          />
-          <p className="label">
-            List other referenced crdbls (space separated).
-          </p>
-
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={!did || isIssuing || !credentialContent}
-          >
-            {isIssuing ? 'Issuing...' : 'Issue Credential'}
-          </button>
-        </fieldset>
-      </form>
-
-      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
-        <legend className="fieldset-legend">My Crdbl Credentials</legend>
-        {credentials.length === 0 ? (
-          <div>No credentials found.</div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {credentials.map((cred, idx) => {
-              // Extract main info
-              const content =
-                cred.credentialSubject?.alias ||
-                cred.credentialSubject?.content ||
-                '';
-              const issuanceDate = cred.issuanceDate || '';
-              // Hide proof.jwt for brevity in details
-              const details = { ...cred };
-              if (details.proof && details.proof.jwt) {
-                details.proof = { ...details.proof, jwt: '[hidden]' };
-              }
-              return (
-                <div className="collapse collapse-arrow bg-base-100" key={idx}>
-                  <input type="checkbox" />
-                  <div className="collapse-title font-medium flex flex-col gap-1">
-                    <span className="text-base font-semibold">
-                      {content || 'Credential'}
-                    </span>
-                    {issuanceDate && (
-                      <span className="text-xs text-gray-500">
-                        Issued: {new Date(issuanceDate).toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="collapse-content">
-                    <pre className="text-xs text-left whitespace-pre-wrap break-all bg-base-300 p-2 rounded-xl">
-                      {JSON.stringify(details, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </fieldset>
+          <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
+            <legend className="fieldset-legend">My Crdbl Credentials</legend>
+            {credentials.length === 0 ? (
+              <div>No credentials found.</div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {credentials.map((cred) => (
+                  <CredentialListItem
+                    key={cred.credentialSubject.id}
+                    cred={cred}
+                  />
+                ))}
+              </div>
+            )}
+          </fieldset>
+        </>
+      )}
     </>
   );
 }
