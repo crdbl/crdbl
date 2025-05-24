@@ -151,7 +151,7 @@ To get started running the application locally:
 Each app requires its own `.env` file. Use the provided example files as templates:
 
 - **API**: Copy [`apps/api/env.example`](apps/api/env.example) to `apps/api/.env` and fill in the required secrets (`CHEQD_API_KEY`, `OPENAI_API_KEY`) and optional settings.
-- **Web Extension**: Copy [`apps/ext/env.example`](apps/ext/env.example) to `apps/ext/.env` and set the `VITE_API_URL` as needed.
+- **Web Extension**: Copy [`apps/ext/env.example`](apps/ext/env.example) to `apps/ext/.env` and configure the URLs as needed.
 
 > **Tip:** Never commit your `.env` files. They are git-ignored by default.
 
