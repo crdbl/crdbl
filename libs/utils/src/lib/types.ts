@@ -30,6 +30,7 @@ export type CrdblCredential = {
   issuer: {
     id: string;
   };
+  id: string;
   proof: {
     jwt: string;
     type: string;
