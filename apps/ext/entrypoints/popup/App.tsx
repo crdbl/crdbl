@@ -6,19 +6,10 @@ import {
   createHolderDid,
   signWithHolderDid,
 } from '@crdbl/utils';
-import { storage } from '#imports';
 import { config } from '../../src/config';
+import { holderDid, selectedText } from '../../src/storage';
 import './App.css';
 import { CredentialListItem } from '../../src/components/CredentialListItem';
-
-// local storage for the holder DID
-const holderDid = storage.defineItem<{
-  did: string;
-  privateKey: string;
-}>('local:holderDid');
-
-// local storage item for selected text
-const selectedText = storage.defineItem<string>('local:selectedText');
 
 function App() {
   const [did, setDid] = useState<string | null>(null);
