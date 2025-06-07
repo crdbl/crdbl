@@ -57,9 +57,8 @@ const credential: FastifyPluginAsync = async (
       // Check all context crdbls exist and are verified with data in IPFS
       const context = []; // all referenced context
       for (const ctxId of attributes.context) {
-        const { cred: ctxCred, verif: ctxVerif } = await getOrVerifyCredential(
-          ctxId
-        );
+        const { cred: ctxCred, verif: ctxVerif } =
+          await getOrVerifyCredential(ctxId);
         if (!ctxCred) {
           return reply
             .status(400)

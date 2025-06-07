@@ -104,16 +104,16 @@ function App() {
               apiStatus === 'ok'
                 ? 'bg-success'
                 : apiStatus === 'error'
-                ? 'bg-error'
-                : 'bg-warning'
+                  ? 'bg-error'
+                  : 'bg-warning'
             }`}
           />
           <span>
             {apiStatus === 'ok'
               ? 'Connected'
               : apiStatus === 'error'
-              ? 'Disconnected'
-              : 'Checking...'}
+                ? 'Disconnected'
+                : 'Checking...'}
           </span>
         </div>
       </div>
