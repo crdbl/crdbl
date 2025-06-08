@@ -1,21 +1,34 @@
-import { useState, useEffect } from 'react';
+import { createHashRouter, Link, Outlet, RouterProvider } from 'react-router';
 import crdblLogo from '@/assets/crdbl.svg';
-import { CrdblCredential, createHolderDid } from '@crdbl/utils';
 import { config } from '../../src/config';
-import { holderDid } from '../../src/storage';
-import { CredentialIssueForm } from '../../src/components/CredentialIssueForm';
-import { CredentialListItem } from '../../src/components/CredentialListItem';
+import { MyCrdbls } from './pages/MyCrdbls';
+import { Settings } from './pages/Settings';
 import './App.css';
 
-function App() {
-  const [did, setDid] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export default function App() {
+  const router = createHashRouter([
+    {
+      element: <Layout />,
+      children: [
+        {
+          path: '/',
+          element: <MyCrdbls />,
+        },
+        {
+          path: '/settings',
+          element: <Settings />,
+        },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+}
+
+function Layout() {
   const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'checking'>(
     'checking'
   );
-  const [credentials, setCredentials] = useState<CrdblCredential[]>([]);
-
   useEffect(() => {
     const checkHealth = async () => {
       try {
@@ -30,73 +43,34 @@ function App() {
     checkHealth();
   }, []);
 
-  useEffect(() => {
-    const checkExistingDid = async () => {
-      try {
-        const stored = await holderDid.getValue();
-        if (stored) setDid(stored.did);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to check existing DID'
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkExistingDid();
-  }, []);
-
-  const handleCreateDid = async () => {
-    try {
-      setIsLoading(true);
-      const { did, privateKey } = await createHolderDid();
-
-      // Store DID and private key using WXT storage
-      await holderDid.setValue({
-        did,
-        privateKey,
-      });
-
-      setDid(did);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create DID');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Fetch credentials for the current DID
-  const fetchCredentials = async (holderDid: string) => {
-    try {
-      const res = await fetch(`${config.API_URL}/credential/list/${holderDid}`);
-      if (!res.ok) throw new Error('Failed to fetch credentials');
-      const data = (await res.json()) as CrdblCredential[];
-      setCredentials(data);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to fetch credentials'
-      );
-    }
-  };
-
-  // Fetch credentials on mount and when DID changes
-  useEffect(() => {
-    if (did) fetchCredentials(did);
-  }, [did]);
-
   return (
-    <>
-      <div className="flex justify-center items-center">
-        <img src={crdblLogo} className="logo" alt="Crdbl logo" />
-        <div className="prose">
-          <h1>crdbl</h1>
+    <div className="flex flex-col min-h-screen w-full">
+      {/* Header */}
+      <div className="navbar bg-base-100 border-b border-base-300 px-4">
+        <div className="flex-1">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={crdblLogo} className="h-8 w-8" alt="Crdbl logo" />
+            <span className="text-xl font-bold">crdbl</span>
+          </Link>
+        </div>
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <Link to="/" className="btn btn-ghost">
+                MyCrdbls
+              </Link>
+            </li>
+            <li>
+              <Link to="/settings" className="btn btn-ghost">
+                Settings
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
 
       {/* API Status Indicator */}
-      <div className="bg-base-200 border-base-300 rounded-box w-full border p-2 mt-4">
+      <div className="bg-base-200 border-base-300 border-b p-2">
         <div className="flex justify-center items-center gap-2">
           <span>API Status:</span>
           <div
@@ -118,59 +92,12 @@ function App() {
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-error mt-4">
-          <span>{error}</span>
+      {/* Main Content */}
+      <main className="flex-1 p-4 w-full">
+        <div className="max-w-full">
+          <Outlet />
         </div>
-      )}
-
-      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
-        <legend className="fieldset-legend">Decentralized identifier</legend>
-        {isLoading ? (
-          <div className="flex justify-center">
-            <span className="loading loading-spinner loading-md"></span>
-          </div>
-        ) : did ? (
-          <div className="justify-center">
-            <span>{did}</span>
-          </div>
-        ) : (
-          <button
-            className="btn btn-primary"
-            onClick={handleCreateDid}
-            disabled={apiStatus !== 'ok'}
-          >
-            Create DID
-          </button>
-        )}
-      </fieldset>
-
-      {did && (
-        <>
-          <CredentialIssueForm
-            disabled={isLoading || apiStatus !== 'ok'}
-            onIssued={() => fetchCredentials(did)}
-          />
-
-          <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
-            <legend className="fieldset-legend">My Crdbl Credentials</legend>
-            {credentials.length === 0 ? (
-              <div>No credentials found.</div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {credentials.map((cred) => (
-                  <CredentialListItem
-                    key={cred.credentialSubject.id}
-                    cred={cred}
-                  />
-                ))}
-              </div>
-            )}
-          </fieldset>
-        </>
-      )}
-    </>
+      </main>
+    </div>
   );
 }
-
-export default App;
