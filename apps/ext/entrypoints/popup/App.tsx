@@ -4,7 +4,11 @@ import { config } from '../../src/config';
 import { MyCrdbls } from './pages/MyCrdbls';
 import { Settings } from './pages/Settings';
 import { SettingsProvider } from '../../src/context/SettingsProvider';
-import { IconCog, IconEllipsisVertical } from '../../src/components/icons';
+import {
+  IconCog,
+  IconEllipsisVertical,
+  IconLink,
+} from '../../src/components/icons';
 import './App.css';
 
 export default function App() {
@@ -49,6 +53,28 @@ function Layout() {
     checkHealth();
   }, []);
 
+  const ApiStatusIndicator = () => (
+    <div
+      className="tooltip tooltip-bottom mr-2"
+      data-tip={
+        apiStatus === 'ok'
+          ? 'API Connected'
+          : apiStatus === 'error'
+            ? 'API Disconnected'
+            : 'API Checking...'
+      }
+    >
+      <div className="indicator">
+        <span
+          className={`indicator-item indicator-bottom status ${apiStatus === 'ok' ? 'status-success' : 'status-error'}`}
+        ></span>
+        <div className="grid place-items-center rounded">
+          <IconLink className="size-4" />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       {/* Header */}
@@ -60,6 +86,7 @@ function Layout() {
           </Link>
         </div>
         <div className="flex-none">
+          <ApiStatusIndicator />
           <ul className="menu menu-horizontal px-1">
             <li>
               <Link to="/" className="btn btn-ghost">
@@ -88,29 +115,6 @@ function Layout() {
               </details>
             </li>
           </ul>
-        </div>
-      </div>
-
-      {/* API Status Indicator */}
-      <div className="bg-base-200 border-base-300 border-b p-2">
-        <div className="flex justify-center items-center gap-2">
-          <span>API Status:</span>
-          <div
-            className={`w-3 h-3 rounded-full ${
-              apiStatus === 'ok'
-                ? 'bg-success'
-                : apiStatus === 'error'
-                  ? 'bg-error'
-                  : 'bg-warning'
-            }`}
-          />
-          <span>
-            {apiStatus === 'ok'
-              ? 'Connected'
-              : apiStatus === 'error'
-                ? 'Disconnected'
-                : 'Checking...'}
-          </span>
         </div>
       </div>
 
