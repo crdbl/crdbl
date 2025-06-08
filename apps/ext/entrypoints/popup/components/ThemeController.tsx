@@ -1,12 +1,11 @@
-import { useTheme } from '../../../src/context/ThemeProvider';
-import { settingsTheme } from '../../../src/storage';
+import { useSetting } from '../../../src/context/SettingsProvider';
 
 export function ThemeController() {
-  const theme = useTheme(); // current value from context
+  const [theme, setTheme] = useSetting('theme'); // current value from context
 
   function toggle() {
     const next = theme === 'dark' ? 'light' : 'dark';
-    settingsTheme.setValue(next); // updates storage → context sync
+    setTheme(next); // updates storage → context sync
   }
 
   return (

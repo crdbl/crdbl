@@ -3,7 +3,7 @@ import crdblLogo from '@/assets/crdbl.svg';
 import { config } from '../../src/config';
 import { MyCrdbls } from './pages/MyCrdbls';
 import { Settings } from './pages/Settings';
-import { ThemeProvider } from '../../src/context/ThemeProvider';
+import { SettingsProvider } from '../../src/context/SettingsProvider';
 import './App.css';
 
 export default function App() {
@@ -24,9 +24,9 @@ export default function App() {
   ]);
 
   return (
-    <ThemeProvider>
+    <SettingsProvider>
       <RouterProvider router={router} />
-    </ThemeProvider>
+    </SettingsProvider>
   );
 }
 

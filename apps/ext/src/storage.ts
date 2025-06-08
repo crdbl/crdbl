@@ -1,5 +1,6 @@
 import { storage } from '#imports';
 import { config } from './config';
+import { Settings } from './settings';
 
 // local storage for the holder DID
 export const holderDid = storage.defineItem<{
@@ -10,7 +11,7 @@ export const holderDid = storage.defineItem<{
 // local storage item for selected text
 export const selectedText = storage.defineItem<string>('local:selectedText');
 
-export type Theme = 'light' | 'dark';
-export const settingsTheme = storage.defineItem<Theme>('sync:theme', {
-  fallback: config.DEFAULT_THEME,
+// local storage item for user settings, synced across entrypoints
+export const settingsItem = storage.defineItem<Settings>('sync:settings', {
+  fallback: config.DEFAULT_SETTINGS,
 });
