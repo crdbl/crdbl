@@ -4,6 +4,7 @@ import { config } from '../../src/config';
 import { MyCrdbls } from './pages/MyCrdbls';
 import { Settings } from './pages/Settings';
 import { SettingsProvider } from '../../src/context/SettingsProvider';
+import { IconCog, IconEllipsisVertical } from '../../src/components/icons';
 import './App.css';
 
 export default function App() {
@@ -66,9 +67,25 @@ function Layout() {
               </Link>
             </li>
             <li>
-              <Link to="/settings" className="btn btn-ghost">
-                Settings
-              </Link>
+              <details className="dropdown dropdown-end">
+                <summary className="btn btn-ghost after:content-none">
+                  <IconEllipsisVertical className="size-5" />
+                </summary>
+                <ul
+                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  onClick={(e) => {
+                    const details = e.currentTarget.closest('details');
+                    if (details) details.removeAttribute('open');
+                  }}
+                >
+                  <li>
+                    <Link to="/settings" className="flex items-center gap-2">
+                      <IconCog className="size-5" />
+                      Settings
+                    </Link>
+                  </li>
+                </ul>
+              </details>
             </li>
           </ul>
         </div>
