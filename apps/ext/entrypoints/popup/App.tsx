@@ -88,7 +88,7 @@ function App() {
 
   return (
     <>
-      <div className="flex justify-center">
+      <div className="flex justify-center items-center">
         <img src={crdblLogo} className="logo" alt="Crdbl logo" />
         <div className="prose">
           <h1>crdbl</h1>
