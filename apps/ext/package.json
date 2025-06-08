@@ -17,7 +17,8 @@
   "dependencies": {
     "@webext-core/messaging": "^2.2.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router": "^7.6.2"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
