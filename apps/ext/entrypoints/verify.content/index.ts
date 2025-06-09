@@ -1,5 +1,6 @@
 import { config } from '../../src/config';
 import { sendMessage } from '../../src/messaging';
+import { pageCredentials } from '../../src/storage';
 import './style.css';
 
 const { CRDBL_REGEX } = config;
@@ -9,7 +10,7 @@ export default defineContentScript({
   runAt: 'document_idle',
 
   async main() {
-    const verifyCrdbls = async () => {
+    const verifyTextCrdbls = async () => {
       // Walk text nodes to collect crdbls
       const crdbls = new Set<string>();
       const walker = document.createTreeWalker(
@@ -20,11 +21,10 @@ export default defineContentScript({
         const txt = n.textContent!;
         for (const [, id] of txt.matchAll(CRDBL_REGEX)) crdbls.add(id);
       }
-      if (crdbls.size === 0) return;
+      if (crdbls.size === 0) return crdbls;
 
       // Ask the background worker for verification status of crdbls
       const verified = await sendMessage('getCrdblVerification', [...crdbls]);
-      console.log('verified', verified);
 
       // Annotate crdbl verification snippets in-place
       walker.currentNode = document.body;
@@ -49,9 +49,9 @@ export default defineContentScript({
         frag.append(parts[parts.length - 1]);
         n.parentNode!.replaceChild(frag, n);
       }
-    };
 
-    await verifyCrdbls();
+      return crdbls;
+    };
 
     // Verify crdbls in HTML data-crdbl attributes
     const verifyDataCrdbls = async () => {
@@ -63,15 +63,29 @@ export default defineContentScript({
         if (id) crdbls.add(id);
       });
 
+      if (crdbls.size === 0) return crdbls;
+
       const verified = await sendMessage('getCrdblVerification', [...crdbls]);
-      console.log('verified-data', verified);
 
       elems.forEach((el) => {
         const id = el.getAttribute('data-crdbl');
         if (!id) return;
         el.classList.add(verified[id] ? 'crdbl-checked' : 'crdbl-warning');
       });
+
+      return crdbls;
     };
-    await verifyDataCrdbls();
+
+    const pageCrdbls = new Set([
+      ...(await verifyTextCrdbls()),
+      ...(await verifyDataCrdbls()),
+    ]);
+
+    if (pageCrdbls.size > 0) {
+      // Update page credentials in storage once with all found crdbls
+      const currentCreds = (await pageCredentials.getValue()) || {};
+      currentCreds[window.location.href] = [...pageCrdbls];
+      await pageCredentials.setValue(currentCreds);
+    }
   },
 });
