@@ -1,21 +1,44 @@
-import { useState, useEffect } from 'react';
+import { createHashRouter, Link, Outlet, RouterProvider } from 'react-router';
 import crdblLogo from '@/assets/crdbl.svg';
-import { CrdblCredential, createHolderDid } from '@crdbl/utils';
 import { config } from '../../src/config';
-import { holderDid } from '../../src/storage';
-import { CredentialIssueForm } from '../../src/components/CredentialIssueForm';
-import { CredentialListItem } from '../../src/components/CredentialListItem';
+import { MyCrdbls } from './pages/MyCrdbls';
+import { Settings } from './pages/Settings';
+import { SettingsProvider } from '../../src/context/SettingsProvider';
+import {
+  IconCog,
+  IconEllipsisVertical,
+  IconLink,
+} from '../../src/components/icons';
 import './App.css';
 
-function App() {
-  const [did, setDid] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export default function App() {
+  const router = createHashRouter([
+    {
+      element: <Layout />,
+      children: [
+        {
+          path: '/',
+          element: <MyCrdbls />,
+        },
+        {
+          path: '/settings',
+          element: <Settings />,
+        },
+      ],
+    },
+  ]);
+
+  return (
+    <SettingsProvider>
+      <RouterProvider router={router} />
+    </SettingsProvider>
+  );
+}
+
+function Layout() {
   const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'checking'>(
     'checking'
   );
-  const [credentials, setCredentials] = useState<CrdblCredential[]>([]);
-
   useEffect(() => {
     const checkHealth = async () => {
       try {
@@ -30,147 +53,77 @@ function App() {
     checkHealth();
   }, []);
 
-  useEffect(() => {
-    const checkExistingDid = async () => {
-      try {
-        const stored = await holderDid.getValue();
-        if (stored) setDid(stored.did);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to check existing DID'
-        );
-      } finally {
-        setIsLoading(false);
+  const ApiStatusIndicator = () => (
+    <div
+      className="tooltip tooltip-bottom mr-2"
+      data-tip={
+        apiStatus === 'ok'
+          ? 'API Connected'
+          : apiStatus === 'error'
+            ? 'API Disconnected'
+            : 'API Checking...'
       }
-    };
-
-    checkExistingDid();
-  }, []);
-
-  const handleCreateDid = async () => {
-    try {
-      setIsLoading(true);
-      const { did, privateKey } = await createHolderDid();
-
-      // Store DID and private key using WXT storage
-      await holderDid.setValue({
-        did,
-        privateKey,
-      });
-
-      setDid(did);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create DID');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Fetch credentials for the current DID
-  const fetchCredentials = async (holderDid: string) => {
-    try {
-      const res = await fetch(`${config.API_URL}/credential/list/${holderDid}`);
-      if (!res.ok) throw new Error('Failed to fetch credentials');
-      const data = (await res.json()) as CrdblCredential[];
-      setCredentials(data);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to fetch credentials'
-      );
-    }
-  };
-
-  // Fetch credentials on mount and when DID changes
-  useEffect(() => {
-    if (did) fetchCredentials(did);
-  }, [did]);
+    >
+      <div className="indicator">
+        <span
+          className={`indicator-item indicator-bottom status ${apiStatus === 'ok' ? 'status-success' : 'status-error'}`}
+        ></span>
+        <div className="grid place-items-center rounded">
+          <IconLink className="size-4" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <>
-      <div className="flex justify-center">
-        <img src={crdblLogo} className="logo" alt="Crdbl logo" />
-        <div className="prose">
-          <h1>crdbl</h1>
+    <div className="flex flex-col min-h-screen w-full">
+      {/* Header */}
+      <div className="navbar bg-base-100 border-b border-base-300 px-4">
+        <div className="flex-1">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={crdblLogo} className="h-8 w-8" alt="Crdbl logo" />
+            <span className="text-xl font-bold">crdbl</span>
+          </Link>
+        </div>
+        <div className="flex-none">
+          <ApiStatusIndicator />
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <Link to="/" className="btn btn-ghost">
+                MyCrdbls
+              </Link>
+            </li>
+            <li>
+              <details className="dropdown dropdown-end">
+                <summary className="btn btn-ghost after:content-none">
+                  <IconEllipsisVertical className="size-5" />
+                </summary>
+                <ul
+                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  onClick={(e) => {
+                    const details = e.currentTarget.closest('details');
+                    if (details) details.removeAttribute('open');
+                  }}
+                >
+                  <li>
+                    <Link to="/settings" className="flex items-center gap-2">
+                      <IconCog className="size-5" />
+                      Settings
+                    </Link>
+                  </li>
+                </ul>
+              </details>
+            </li>
+          </ul>
         </div>
       </div>
 
-      {/* API Status Indicator */}
-      <div className="bg-base-200 border-base-300 rounded-box w-full border p-2 mt-4">
-        <div className="flex justify-center items-center gap-2">
-          <span>API Status:</span>
-          <div
-            className={`w-3 h-3 rounded-full ${
-              apiStatus === 'ok'
-                ? 'bg-success'
-                : apiStatus === 'error'
-                ? 'bg-error'
-                : 'bg-warning'
-            }`}
-          />
-          <span>
-            {apiStatus === 'ok'
-              ? 'Connected'
-              : apiStatus === 'error'
-              ? 'Disconnected'
-              : 'Checking...'}
-          </span>
+      {/* Main Content */}
+      <main className="flex-1 p-4 w-full">
+        <div className="max-w-full">
+          <Outlet />
         </div>
-      </div>
-
-      {error && (
-        <div className="alert alert-error mt-4">
-          <span>{error}</span>
-        </div>
-      )}
-
-      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
-        <legend className="fieldset-legend">Decentralized identifier</legend>
-        {isLoading ? (
-          <div className="flex justify-center">
-            <span className="loading loading-spinner loading-md"></span>
-          </div>
-        ) : did ? (
-          <div className="justify-center">
-            <span>{did}</span>
-          </div>
-        ) : (
-          <button
-            className="btn btn-primary"
-            onClick={handleCreateDid}
-            disabled={apiStatus !== 'ok'}
-          >
-            Create DID
-          </button>
-        )}
-      </fieldset>
-
-      {did && (
-        <>
-          <CredentialIssueForm
-            disabled={isLoading || apiStatus !== 'ok'}
-            onIssued={() => fetchCredentials(did)}
-          />
-
-          <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full border p-4 mt-4">
-            <legend className="fieldset-legend">My Crdbl Credentials</legend>
-            {credentials.length === 0 ? (
-              <div>No credentials found.</div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {credentials.map((cred) => (
-                  <CredentialListItem
-                    key={cred.credentialSubject.id}
-                    cred={cred}
-                  />
-                ))}
-              </div>
-            )}
-          </fieldset>
-        </>
-      )}
-    </>
+      </main>
+    </div>
   );
 }
-
-export default App;
