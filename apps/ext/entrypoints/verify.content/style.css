@@ -1,8 +1,8 @@
 .crdbl-checked::after {
   content: '';
   display: inline-block;
-  width: 1em;
-  height: 1em;
+  width: 1.25em;
+  height: 1.25em;
   background: url(~/assets/crdbl_checked.svg) center / contain no-repeat;
   vertical-align: middle;
   margin-left: 0.5em;
@@ -11,8 +11,8 @@
 .crdbl-warning::after {
   content: '';
   display: inline-block;
-  width: 1em;
-  height: 1em;
+  width: 1.25em;
+  height: 1.25em;
   background: url(~/assets/crdbl_warning.svg) center / contain no-repeat;
   vertical-align: middle;
   margin-left: 0.5em;
