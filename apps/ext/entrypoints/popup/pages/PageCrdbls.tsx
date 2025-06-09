@@ -38,9 +38,6 @@ export function PageCrdbls() {
 
       const credData = await sendMessage('getCrdblData', crdbls);
       setCredentials(credData);
-
-      console.log('verifs', verifStatus);
-      console.log('data', credData);
     } catch (err) {
       console.error('Error in fetchPageCredentials:', err);
       setError(
@@ -89,7 +86,11 @@ export function PageCrdbls() {
       {Object.entries(credentials)
         .filter(([, cred]) => cred != null)
         .map(([key, cred]) => (
-          <CredentialListItem key={key} cred={cred!} />
+          <CredentialListItem
+            key={key}
+            cred={cred!}
+            verified={verifStatus[key]}
+          />
         ))}
 
       {/* Not Found Crdbls */}

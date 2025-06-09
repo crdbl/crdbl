@@ -1,8 +1,15 @@
 import { CrdblCredential } from '@crdbl/utils';
 import { config } from '../config';
+import '../../entrypoints/verify.content/style.css';
 
 // Component for displaying a credential and its IPFS content
-export function CredentialListItem({ cred }: { cred: CrdblCredential }) {
+export function CredentialListItem({
+  cred,
+  verified,
+}: {
+  cred: CrdblCredential;
+  verified?: boolean;
+}) {
   const title = cred.credentialSubject.alias || 'Credential';
   const issuanceDate = cred.issuanceDate || '';
   const details = { ...cred };
@@ -12,11 +19,16 @@ export function CredentialListItem({ cred }: { cred: CrdblCredential }) {
   const id = cred.id;
   const cid = cred.credentialSubject.content;
 
+  const verifClassname =
+    verified === undefined ? '' : verified ? 'crdbl-checked' : 'crdbl-warning';
+
   return (
     <div className="collapse collapse-arrow bg-base-100">
       <input type="checkbox" />
       <div className="collapse-title font-medium flex flex-col gap-1">
-        <span className="text-base font-semibold">{title}</span>
+        <span className={`text-base font-semibold ${verifClassname}`}>
+          crdbl:{title}
+        </span>
         {issuanceDate && (
           <span className="text-xs text-gray-500">
             Issued: {new Date(issuanceDate).toLocaleString()}
