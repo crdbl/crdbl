@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { browser } from 'wxt/browser';
 import { CrdblCredential } from '@crdbl/utils';
 import { CredentialListItem } from '../../../src/components/CredentialListItem';
+import { CredentialNotFound } from '../../../src/components/CredentialNotFound';
 import { pageCredentials } from '../../../src/storage';
 import { onMessage, sendMessage } from '../../../src/messaging';
 
@@ -105,11 +106,7 @@ export function PageCrdbls() {
       {Object.entries(credentials)
         .filter(([, cred]) => cred == null)
         .map(([key]) => (
-          <div key={key} className="flex items-center gap-2">
-            <span className="text-lg text-warning">?</span>
-            <span className="font-mono">crdbl:{key}</span>
-            <span className="text-sm text-gray-500">(not found)</span>
-          </div>
+          <CredentialNotFound key={key} id={key} />
         ))}
     </div>
   );
