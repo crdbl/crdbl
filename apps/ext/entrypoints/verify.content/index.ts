@@ -71,6 +71,7 @@ export default defineContentScript({
         const id = el.getAttribute('data-crdbl');
         if (!id) return;
         el.classList.add(verified[id] ? 'crdbl-checked' : 'crdbl-warning');
+        el.setAttribute('title', `crdbl:${id}`);
       });
 
       return crdbls;
