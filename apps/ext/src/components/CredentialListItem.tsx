@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CrdblCredential } from '@crdbl/utils';
 import { config } from '../config';
 import { sendMessage } from '../messaging';
@@ -27,6 +27,9 @@ export function CredentialListItem({
   >({});
   const [contextVerif, setContextVerif] = useState<Record<string, boolean>>({});
   const [isLoadingContext, setIsLoadingContext] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    'content' | 'context' | 'credential'
+  >('content');
 
   const verifClassname =
     verified === undefined ? '' : verified ? 'crdbl-checked' : 'crdbl-warning';
@@ -69,7 +72,8 @@ export function CredentialListItem({
             name={`tabs_${id}`}
             className="tab"
             aria-label="Content"
-            defaultChecked
+            checked={activeTab === 'content'}
+            onChange={() => setActiveTab('content')}
           />
           <div className="tab-content bg-base-100 border-base-300">
             <div className="card-body p-2">
@@ -98,7 +102,11 @@ export function CredentialListItem({
                 name={`tabs_${id}`}
                 className="tab"
                 aria-label="Context"
-                onChange={loadContext}
+                checked={activeTab === 'context'}
+                onChange={() => {
+                  setActiveTab('context');
+                  loadContext();
+                }}
               />
               <div className="tab-content bg-base-100 border-base-300">
                 <div className="card-body p-2">
@@ -136,6 +144,8 @@ export function CredentialListItem({
             name={`tabs_${id}`}
             className="tab"
             aria-label="Credential"
+            checked={activeTab === 'credential'}
+            onChange={() => setActiveTab('credential')}
           />
           <div className="tab-content bg-base-100 border-base-300">
             <div className="card-body p-2">
