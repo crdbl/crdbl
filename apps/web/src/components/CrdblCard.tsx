@@ -2,7 +2,7 @@ interface CrdblCardProps {
   title: string;
   content: string;
   context?: string[];
-  whyWorks: string | string[];
+  whyWorks: string[];
   crdblId: string;
   label: string;
   getRefData: (ref: string) => { title: string };
@@ -47,20 +47,25 @@ export function CrdblCard({
 
         {whyWorks && (
           <div className="mt-6">
-            <h3 className="text-sm font-medium text-left mb-2 opacity-70">
-              Why This Works
-            </h3>
-            <ul className="list-disc list-inside text-left text-sm italic opacity-80">
-              {Array.isArray(whyWorks) ? (
-                whyWorks.map((reason, i) => (
-                  <li key={i} className="ml-4">
-                    {reason}
-                  </li>
-                ))
-              ) : (
-                <li className="ml-4">{whyWorks}</li>
-              )}
-            </ul>
+            {whyWorks.length === 1 ? (
+              <div className="text-sm text-left">
+                <span className="font-medium opacity-70">Why This Works:</span>{' '}
+                <span className="italic opacity-80">{whyWorks[0]}</span>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-sm font-medium text-left mb-2 opacity-70">
+                  Why This Works
+                </h3>
+                <ul className="list-disc list-inside text-left text-sm italic opacity-80">
+                  {whyWorks.map((reason: string, i: number) => (
+                    <li key={i} className="ml-4">
+                      {reason}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         )}
       </div>
