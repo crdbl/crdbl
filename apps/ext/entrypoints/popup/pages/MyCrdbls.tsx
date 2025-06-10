@@ -112,15 +112,21 @@ export function MyCrdbls() {
               <div>No credentials found.</div>
             ) : (
               <div className="flex flex-col gap-2">
-                {credentials.map((cred) => (
-                  <CredentialListItem
-                    key={cred.id}
-                    cred={cred}
-                    verified={
-                      verifStatus[cred.credentialSubject.alias || cred.id]
-                    }
-                  />
-                ))}
+                {credentials
+                  .sort(
+                    (a, b) =>
+                      new Date(b.issuanceDate).getTime() -
+                      new Date(a.issuanceDate).getTime()
+                  )
+                  .map((cred) => (
+                    <CredentialListItem
+                      key={cred.id}
+                      cred={cred}
+                      verified={
+                        verifStatus[cred.credentialSubject.alias || cred.id]
+                      }
+                    />
+                  ))}
               </div>
             )}
           </fieldset>
