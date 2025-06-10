@@ -1,14 +1,58 @@
+import {
+  createBrowserRouter,
+  Link,
+  Outlet,
+  RouterProvider,
+} from 'react-router';
 import './App.css';
 
-function App() {
+export default function App() {
+  const router = createBrowserRouter([
+    {
+      element: <Layout />,
+      children: [
+        {
+          path: '/',
+          element: <Home />,
+        },
+        {
+          path: '/demo',
+          element: <Demo />,
+        },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+}
+
+function Layout() {
   return (
     <div className="flex flex-col justify-center prose">
       <h2>Crdbl: Building the Credible Web</h2>
+      <div>
+        <Outlet />
+      </div>
+    </div>
+  );
+}
+
+function Home() {
+  return (
+    <Link to="/demo">
       <img src="/crdbl.svg" className="logo scale-50" alt="Crdbl logo" />
+    </Link>
+  );
+}
+
+function Demo() {
+  return (
+    <div className="flex flex-col justify-center prose">
       <fieldset className="fieldset bg-base-200 border-base-300 rounded-box border p-4 w-full">
         <legend className="fieldset-legend">embedded crdbl demo</legend>
         <div className="flex flex-col gap-4 prose">
           <label className="label">Text Reference:</label>
+          <span>crdbl:tDhKKC9bpj</span>
           <span>crdbl:wTNhMzcM8g</span>
           <span>crdbl:111111111</span>
           <label className="label">HTML Attributes:</label>
@@ -18,8 +62,13 @@ function App() {
           </div>
         </div>
       </fieldset>
+      <hr />
+      <div data-crdbl="d686n8ww8R">
+        Given the 1.1°C temperature rise driving clean energy demand, combined
+        with 90% solar cost reductions and 35% EV growth, renewable energy
+        infrastructure represents the highest-opportunity investment sector for
+        2024-2025.
+      </div>
     </div>
   );
 }
-
-export default App;
