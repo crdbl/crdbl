@@ -2,6 +2,7 @@ import { createHashRouter, Link, Outlet, RouterProvider } from 'react-router';
 import crdblLogo from '@/assets/crdbl.svg';
 import { config } from '../../src/config';
 import { MyCrdbls } from './pages/MyCrdbls';
+import { PageCrdbls } from './pages/PageCrdbls';
 import { Settings } from './pages/Settings';
 import { SettingsProvider } from '../../src/context/SettingsProvider';
 import {
@@ -18,6 +19,10 @@ export default function App() {
       children: [
         {
           path: '/',
+          element: <PageCrdbls />,
+        },
+        {
+          path: '/my-crdbls',
           element: <MyCrdbls />,
         },
         {
@@ -89,7 +94,7 @@ function Layout() {
           <ApiStatusIndicator />
           <ul className="menu menu-horizontal px-1">
             <li>
-              <Link to="/" className="btn btn-ghost">
+              <Link to="/my-crdbls" className="btn btn-ghost">
                 MyCrdbls
               </Link>
             </li>

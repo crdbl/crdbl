@@ -1,10 +1,11 @@
-import { CredentialVerification } from '@crdbl/utils';
+import { CrdblCredential, CredentialVerification } from '@crdbl/utils';
 import { config } from '../src/config';
-import { onMessage } from '../src/messaging';
+import { onMessage, sendMessage } from '../src/messaging';
 import { selectedText } from '../src/storage';
 
-// session cache of crdbl verifications
-const cache = new Map<string, boolean>();
+// session cache of crdbl data and verification status
+const cacheData = new Map<string, CrdblCredential | null>();
+const cacheVerif = new Map<string, boolean>();
 
 export default defineBackground(() => {
   console.log('Hello background!', { id: browser.runtime.id });
@@ -13,7 +14,7 @@ export default defineBackground(() => {
     const uuids = msg.data;
 
     // fetch verification results for those not in cache
-    const unknown = uuids.filter((u: string) => !cache.has(u));
+    const unknown = uuids.filter((u: string) => !cacheVerif.has(u));
     if (unknown.length) {
       const pairs = await Promise.all(
         unknown.map(async (id: string) => {
@@ -27,11 +28,37 @@ export default defineBackground(() => {
           }
         })
       );
-      pairs.forEach(([id, ok]) => cache.set(id, ok));
+      pairs.forEach(([id, ok]) => cacheVerif.set(id, ok));
     }
 
     return Object.fromEntries(
-      uuids.map((u: string) => [u, cache.get(u) ?? false])
+      uuids.map((u: string) => [u, cacheVerif.get(u) ?? false])
+    );
+  });
+
+  onMessage('getCrdblData', async (msg) => {
+    const uuids = msg.data;
+
+    // fetch credenntial details for those not in cache
+    const unknown = uuids.filter((u: string) => !cacheData.has(u));
+    if (unknown.length) {
+      const pairs = await Promise.all(
+        unknown.map(async (id: string) => {
+          try {
+            const r = await fetch(`${config.API_URL}/credential/${id}`);
+            if (!r.ok) throw new Error();
+            const data = (await r.json()) as CrdblCredential;
+            return [id, data] as const;
+          } catch {
+            return [id, null] as const;
+          }
+        })
+      );
+      pairs.forEach(([id, data]) => cacheData.set(id, data));
+    }
+
+    return Object.fromEntries(
+      uuids.map((u: string) => [u, cacheData.get(u) ?? null])
     );
   });
 
@@ -110,6 +137,15 @@ export default defineBackground(() => {
         await (browser as any).sidebarAction.open();
         return;
       }
+    }
+  });
+
+  // Send a message when tab url changes
+  browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url) {
+      void sendMessage('urlChanged', { tabId, tabUrl: tab.url }).catch(() => {
+        // ignore error when no listeners: Receiving end does not exist
+      });
     }
   });
 });

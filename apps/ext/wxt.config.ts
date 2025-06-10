@@ -10,7 +10,13 @@ export default defineConfig({
   manifest: {
     host_permissions: [`${config.API_URL}/*`, `${config.IPFS_URL}/*`],
 
-    permissions: ['storage', 'sidepanel', 'sidebar_action', 'contextMenus'],
+    permissions: [
+      'contextMenus',
+      'sidebar_action',
+      'sidepanel',
+      'storage',
+      'tabs',
+    ],
   },
 
   vite: () => ({
