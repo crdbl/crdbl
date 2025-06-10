@@ -23,11 +23,11 @@ export function CredentialListItem({
     verified === undefined ? '' : verified ? 'crdbl-checked' : 'crdbl-warning';
 
   return (
-    <div className="collapse collapse-arrow bg-base-100">
+    <div className="collapse collapse-arrow bg-base-100 shadow-xl ring-2 ring-base-content/10">
       <input type="checkbox" />
       <div className="collapse-title font-medium flex flex-col gap-1">
         <span className={`text-base font-semibold ${verifClassname}`}>
-          crdbl:{title}
+          {title}
         </span>
         {issuanceDate && (
           <span className="text-xs text-gray-500">
