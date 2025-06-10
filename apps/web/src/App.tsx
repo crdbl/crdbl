@@ -4,7 +4,21 @@ import {
   Outlet,
   RouterProvider,
 } from 'react-router';
+import {
+  DemoProvenanceA,
+  DemoProvenanceB,
+  DemoProvenanceC,
+} from './pages/DemoProvenance';
 import './App.css';
+
+function Home() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-12 py-12">
+      <h1 className="text-4xl font-bold">Building the Credible Web</h1>
+      <img src="/crdbl.svg" className="logo scale-100" alt="Crdbl logo" />
+    </div>
+  );
+}
 
 export default function App() {
   const router = createBrowserRouter([
@@ -16,8 +30,16 @@ export default function App() {
           element: <Home />,
         },
         {
-          path: '/demo',
-          element: <Demo />,
+          path: '/demo/provenance/a',
+          element: <DemoProvenanceA />,
+        },
+        {
+          path: '/demo/provenance/b',
+          element: <DemoProvenanceB />,
+        },
+        {
+          path: '/demo/provenance/c',
+          element: <DemoProvenanceC />,
         },
       ],
     },
@@ -28,47 +50,32 @@ export default function App() {
 
 function Layout() {
   return (
-    <div className="flex flex-col justify-center prose">
-      <h2>Crdbl: Building the Credible Web</h2>
-      <div>
-        <Outlet />
-      </div>
-    </div>
-  );
-}
-
-function Home() {
-  return (
-    <Link to="/demo">
-      <img src="/crdbl.svg" className="logo scale-50" alt="Crdbl logo" />
-    </Link>
-  );
-}
-
-function Demo() {
-  return (
-    <div className="flex flex-col justify-center prose">
-      <fieldset className="fieldset bg-base-200 border-base-300 rounded-box border p-4 w-full">
-        <legend className="fieldset-legend">embedded crdbl demo</legend>
-        <div className="flex flex-col gap-4 prose">
-          <label className="label">Text Reference:</label>
-          <span>crdbl:tDhKKC9bpj</span>
-          <span>crdbl:wTNhMzcM8g</span>
-          <span>crdbl:111111111</span>
-          <label className="label">HTML Attributes:</label>
-          <div data-crdbl="wTNhMzcM8g">verifiably credible content here</div>
-          <div data-crdbl="XXXXXXXXXX">
-            this content is not verifiably credible
-          </div>
+    <div className="flex flex-col min-h-screen w-full">
+      {/* Header */}
+      <div className="navbar bg-base-100 border-b border-base-300 px-4">
+        <div className="flex-1">
+          <Link to="/" className="flex items-center gap-2">
+            <img src="/crdbl.svg" className="h-8 w-8" alt="Crdbl logo" />
+            <span className="text-xl font-bold">crdbl</span>
+          </Link>
         </div>
-      </fieldset>
-      <hr />
-      <div data-crdbl="d686n8ww8R">
-        Given the 1.1°C temperature rise driving clean energy demand, combined
-        with 90% solar cost reductions and 35% EV growth, renewable energy
-        infrastructure represents the highest-opportunity investment sector for
-        2024-2025.
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <Link to="/demo/provenance/a" className="btn btn-ghost">
+                Demo
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
+
+      {/* Main Content */}
+      <main className="flex-1 p-4 w-full">
+        <div className="max-w-4xl mx-auto">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 }
