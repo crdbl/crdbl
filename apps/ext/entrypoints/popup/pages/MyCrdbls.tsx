@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CrdblCredential, createHolderDid } from '@crdbl/utils';
+import { CrdblCredential, createHolderDid, shortenDid } from '@crdbl/utils';
 import { config } from '../../../src/config';
 import { holderDid } from '../../../src/storage';
 import { CredentialIssueForm } from '../../../src/components/CredentialIssueForm';
@@ -83,7 +83,7 @@ export function MyCrdbls() {
           </div>
         ) : did ? (
           <div className="justify-center">
-            <span>{did}</span>
+            <span title={did}>{shortenDid(did)}</span>
           </div>
         ) : (
           <button className="btn btn-primary" onClick={handleCreateDid}>
