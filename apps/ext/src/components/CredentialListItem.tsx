@@ -8,9 +8,11 @@ import '../../entrypoints/verify.content/style.css';
 export function CredentialListItem({
   cred,
   verified,
+  instanceId = Math.random().toString(36).substring(7),
 }: {
   cred: CrdblCredential;
   verified?: boolean;
+  instanceId?: string;
 }) {
   const title = cred.credentialSubject.alias || 'Credential';
   const issuanceDate = cred.issuanceDate || '';
@@ -18,7 +20,6 @@ export function CredentialListItem({
   if (details.proof && details.proof.jwt) {
     details.proof = { ...details.proof, jwt: '[hidden]' };
   }
-  const id = cred.id;
   const cid = cred.credentialSubject.content;
   const contextIds = cred.credentialSubject.context || [];
 
@@ -69,7 +70,7 @@ export function CredentialListItem({
         <div className="tabs tabs-lift">
           <input
             type="radio"
-            name={`tabs_${id}`}
+            name={`tabs_${instanceId}`}
             className="tab"
             aria-label="Content"
             checked={activeTab === 'content'}
@@ -99,7 +100,7 @@ export function CredentialListItem({
             <>
               <input
                 type="radio"
-                name={`tabs_${id}`}
+                name={`tabs_${instanceId}`}
                 className="tab"
                 aria-label="Context"
                 checked={activeTab === 'context'}
@@ -120,7 +121,7 @@ export function CredentialListItem({
                         .filter(([, cred]) => cred != null)
                         .map(([key, cred]) => (
                           <CredentialListItem
-                            key={key}
+                            key={`${instanceId}-${key}`}
                             cred={cred!}
                             verified={contextVerif[key]}
                           />
@@ -128,7 +129,10 @@ export function CredentialListItem({
                       {Object.entries(contextCreds)
                         .filter(([, cred]) => cred == null)
                         .map(([key]) => (
-                          <div key={key} className="text-xs text-gray-400">
+                          <div
+                            key={`${instanceId}-${key}`}
+                            className="text-xs text-gray-400"
+                          >
                             Context credential not found: {key}
                           </div>
                         ))}
@@ -141,7 +145,7 @@ export function CredentialListItem({
 
           <input
             type="radio"
-            name={`tabs_${id}`}
+            name={`tabs_${instanceId}`}
             className="tab"
             aria-label="Credential"
             checked={activeTab === 'credential'}
