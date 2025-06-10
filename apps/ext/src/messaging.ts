@@ -9,6 +9,8 @@ interface ProtocolMap {
   getCrdblVerification(uuids: string[]): {
     [k: string]: boolean;
   };
+
+  urlChanged(data: { tabId: number; tabUrl: string }): void;
 }
 
 export const { sendMessage, onMessage } =

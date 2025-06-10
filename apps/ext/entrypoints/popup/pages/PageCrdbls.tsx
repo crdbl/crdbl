@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { browser } from 'wxt/browser';
 import { CrdblCredential } from '@crdbl/utils';
 import { CredentialListItem } from '../../../src/components/CredentialListItem';
 import { pageCredentials } from '../../../src/storage';
-import { sendMessage } from '../../../src/messaging';
+import { onMessage, sendMessage } from '../../../src/messaging';
 
 export function PageCrdbls() {
   const [credentials, setCredentials] = useState<
@@ -48,13 +49,20 @@ export function PageCrdbls() {
     }
   };
 
-  // Fetch credentials on mount and when storage changes
+  // Fetch page credentials on mount and when storage or URL changes
   useEffect(() => {
     fetchPageCredentials();
 
     // Watch for storage changes
-    const unwatch = pageCredentials.watch(() => fetchPageCredentials());
-    return () => unwatch();
+    const unwatchStorage = pageCredentials.watch(() => fetchPageCredentials());
+
+    // Watch for URL changes
+    const unwatchUrl = onMessage('urlChanged', () => fetchPageCredentials());
+
+    return () => {
+      unwatchStorage();
+      unwatchUrl();
+    };
   }, []);
 
   if (isLoading) {

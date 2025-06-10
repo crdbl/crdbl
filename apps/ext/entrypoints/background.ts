@@ -1,6 +1,6 @@
 import { CrdblCredential, CredentialVerification } from '@crdbl/utils';
 import { config } from '../src/config';
-import { onMessage } from '../src/messaging';
+import { onMessage, sendMessage } from '../src/messaging';
 import { selectedText } from '../src/storage';
 
 // session cache of crdbl data and verification status
@@ -137,6 +137,15 @@ export default defineBackground(() => {
         await (browser as any).sidebarAction.open();
         return;
       }
+    }
+  });
+
+  // Send a message when tab url changes
+  browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url) {
+      void sendMessage('urlChanged', { tabId, tabUrl: tab.url }).catch(() => {
+        // ignore error when no listeners: Receiving end does not exist
+      });
     }
   });
 });
