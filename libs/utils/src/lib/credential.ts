@@ -8,6 +8,16 @@ export type HolderDidResult = {
 };
 
 /**
+ * Return a shortened form of a DID (for display only).
+ * @param did - The DID string to shorten
+ * @returns string - The shortened DID
+ */
+export function shortenDid(did: string): string {
+  if (did.length <= 24) return did;
+  return `${did.slice(0, 16)}...${did.slice(-8)}`;
+}
+
+/**
  * Create a holder did:key.
  * @returns Promise<HolderDidResult> - The holder did:key, private key, and public key
  */
