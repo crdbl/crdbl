@@ -82,7 +82,7 @@ export function CredentialListItem({
                   src={`${config.IPFS_URL}/${cid}`}
                   sandbox=""
                   referrerPolicy="no-referrer"
-                  className="w-full min-h-[300px] max-h-[500px] rounded-xl bg-base-300"
+                  className="w-full min-h-[100px] max-h-[500px] rounded-xl bg-base-300"
                   title={`IPFS:${cid}`}
                   loading="lazy"
                   allow="clipboard-read; clipboard-write"
