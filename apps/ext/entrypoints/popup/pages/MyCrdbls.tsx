@@ -4,12 +4,14 @@ import { config } from '../../../src/config';
 import { holderDid } from '../../../src/storage';
 import { CredentialIssueForm } from '../../../src/components/CredentialIssueForm';
 import { CredentialListItem } from '../../../src/components/CredentialListItem';
+import { sendMessage } from '../../../src/messaging';
 
 export function MyCrdbls() {
   const [did, setDid] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [credentials, setCredentials] = useState<CrdblCredential[]>([]);
+  const [verifStatus, setVerifStatus] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const checkExistingDid = async () => {
@@ -55,6 +57,11 @@ export function MyCrdbls() {
       if (!res.ok) throw new Error('Failed to fetch credentials');
       const data = (await res.json()) as CrdblCredential[];
       setCredentials(data);
+
+      // get credential verification status
+      const ids = data.map((c) => c.credentialSubject.alias || c.id);
+      const verif = await sendMessage('getCrdblVerification', ids);
+      setVerifStatus(verif);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to fetch credentials'
@@ -107,8 +114,11 @@ export function MyCrdbls() {
               <div className="flex flex-col gap-2">
                 {credentials.map((cred) => (
                   <CredentialListItem
-                    key={cred.credentialSubject.id}
+                    key={cred.id}
                     cred={cred}
+                    verified={
+                      verifStatus[cred.credentialSubject.alias || cred.id]
+                    }
                   />
                 ))}
               </div>
