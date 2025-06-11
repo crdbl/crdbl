@@ -55,7 +55,7 @@ const data = {
     title: 'Investment Recommendation',
     content:
       'Given the 1.1°C temperature rise driving clean energy demand, combined with 90% solar cost reductions and 35% EV growth, renewable energy infrastructure represents the highest-opportunity investment sector for 2024-2025.',
-    context: ['A1', 'A2', 'A3', 'B1', 'B2'],
+    context: ['B1', 'B2'],
     whyWorks: [
       'Synthesizes all lower-level facts',
       'Makes a logical conclusion',
