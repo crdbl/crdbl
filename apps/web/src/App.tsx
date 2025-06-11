@@ -60,7 +60,20 @@ function Layout() {
             </Link>
             <ul className="menu menu-horizontal">
               <li>
-                <Link to="/demo/provenance/a" className="btn btn-ghost">Demo</Link>
+                <details className="dropdown dropdown-end">
+                  <summary className="btn btn-ghost">Demos</summary>
+                  <ul
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                    onClick={(e) => {
+                      const details = e.currentTarget.closest('details');
+                      if (details) details.removeAttribute('open');
+                    }}
+                  >
+                    <li>
+                      <Link to="/demo/provenance/a">Provenance</Link>
+                    </li>
+                  </ul>
+                </details>
               </li>
             </ul>
           </div>
