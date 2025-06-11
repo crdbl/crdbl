@@ -60,7 +60,7 @@ const data = {
     context: [],
     whyWorks: [
       'Credential links excerpt to full article and source documents.',
-      'Signature from the newsroom’s key ensures chain-of-custody integrity.',
+      'Signature from the newsroom's key ensures chain-of-custody integrity.',
     ],
   },
 */
@@ -126,6 +126,44 @@ export function DemoBasic() {
         label={getLabel(crdbls.T5)}
         getRefData={getRefData}
       />
+
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title">Embedding crdbls in Web Content</h2>
+          <p className="text-base-content/80 mb-4">
+            There are two ways to embed crdbls in your web content. The crdbl
+            browser extension will automatically detect and verify both methods,
+            showing a verification icon next to the content.
+          </p>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold mb-2">1. HTML Attribute Method</h3>
+              <div className="mockup-code bg-base-200">
+                <pre>
+                  &lt;span data-crdbl="xfJQRF9Jdr"&gt;This content is verifiably
+                  credible.&lt;/span&gt;
+                </pre>
+              </div>
+              <p className="text-sm text-base-content/70 mt-2">
+                Best for semantic markup and accessibility. Works in any HTML
+                context.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">2. Text Reference Method</h3>
+              <div className="mockup-code bg-base-200">
+                <pre>This content is verifiably credible. crdbl:xfJQRF9Jdr</pre>
+              </div>
+              <p className="text-sm text-base-content/70 mt-2">
+                Works in any plain text context, including markdown and plain
+                text editors.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </DemoLevel>
   );
 }
