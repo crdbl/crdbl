@@ -8,6 +8,7 @@ import {
   DemoProvenanceA,
   DemoProvenanceB,
   DemoProvenanceC,
+  DemoProvenanceD,
 } from './pages/DemoProvenance';
 import { DemoBasic } from './pages/DemoBasic';
 import './App.css';
@@ -45,6 +46,10 @@ export default function App() {
         {
           path: '/demo/provenance/c',
           element: <DemoProvenanceC />,
+        },
+        {
+          path: '/demo/provenance/d',
+          element: <DemoProvenanceD />,
         },
       ],
     },

@@ -76,6 +76,7 @@ const provenanceSteps = [
   { label: 'Facts', path: '/demo/provenance/a', dataContent: 'A' },
   { label: 'Analysis', path: '/demo/provenance/b', dataContent: 'B' },
   { label: 'Strategy', path: '/demo/provenance/c', dataContent: 'C' },
+  { label: 'Summary', path: '/demo/provenance/d', dataContent: 'D' },
 ];
 
 export function DemoProvenanceA() {
@@ -141,6 +142,7 @@ export function DemoProvenanceC() {
       title="Strategic Conclusions"
       description="Strategic conclusions that synthesize all previous levels"
       prevPath="/demo/provenance/b"
+      nextPath="/demo/provenance/d"
       currentStep="/demo/provenance/c"
       steps={provenanceSteps}
     >
@@ -150,6 +152,83 @@ export function DemoProvenanceC() {
         label={getLabel(crdbls.C1)}
         getRefData={getRefData}
       />
+    </DemoLevel>
+  );
+}
+
+export function DemoProvenanceD() {
+  return (
+    <DemoLevel
+      title="Key Benefits"
+      description="Understanding the power of composable trust and verification"
+      prevPath="/demo/provenance/c"
+      currentStep="/demo/provenance/d"
+      steps={provenanceSteps}
+    >
+      <div className="prose max-w-none">
+        <div className="space-y-8">
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title text-xl">
+                <span className="text-2xl mr-2">🔗</span>
+                Composable Trust
+              </h3>
+              <p className="text-lg italic">
+                Each level builds trust on the previous one, like a pyramid of
+                verified knowledge
+              </p>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title text-xl">
+                <span className="text-2xl mr-2">🤖</span>
+                AI-Powered Verification
+              </h3>
+              <p className="text-lg italic">
+                AI automatically prevents contradictory claims from being issued
+              </p>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title text-xl">
+                <span className="text-2xl mr-2">📊</span>
+                Full Provenance
+              </h3>
+              <p className="text-lg italic">
+                Every conclusion can be traced back to its original sources
+              </p>
+            </div>
+          </div>
+
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h3 className="card-title text-xl">
+                <span className="text-2xl mr-2">⚡</span>
+                Real-World Applications
+              </h3>
+              <div className="space-y-2 mt-2">
+                <p className="text-base italic">
+                  Research papers with verified citations
+                </p>
+                <p className="text-base italic">
+                  AI-generated reports with source transparency
+                </p>
+                <p className="text-base italic">
+                  News articles with fact-checking chains
+                </p>
+                <p className="text-base italic">
+                  Investment analysis with data lineage
+                </p>
+                <p className="text-base italic">and more...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </DemoLevel>
   );
 }
