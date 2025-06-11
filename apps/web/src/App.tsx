@@ -9,12 +9,13 @@ import {
   DemoProvenanceB,
   DemoProvenanceC,
 } from './pages/DemoProvenance';
+import { DemoBasic } from './pages/DemoBasic';
 import './App.css';
 
 function Home() {
   return (
     <div className="flex flex-col items-center justify-center gap-12 py-12">
-      <h1 className="text-4xl font-bold">Building the Credible Web</h1>
+      <h1 className="text-4xl font-bold">crdbl: Building the Credible Web</h1>
       <img src="/crdbl.svg" className="logo scale-100" alt="Crdbl logo" />
     </div>
   );
@@ -28,6 +29,10 @@ export default function App() {
         {
           path: '/',
           element: <Home />,
+        },
+        {
+          path: '/demo/basic',
+          element: <DemoBasic />,
         },
         {
           path: '/demo/provenance/a',
@@ -69,6 +74,9 @@ function Layout() {
                       if (details) details.removeAttribute('open');
                     }}
                   >
+                    <li>
+                      <Link to="/demo/basic">Basic</Link>
+                    </li>
                     <li>
                       <Link to="/demo/provenance/a">Provenance</Link>
                     </li>
