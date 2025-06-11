@@ -69,12 +69,20 @@ function getRefData(ref: string) {
   return data[ref as keyof typeof data];
 }
 
+const provenanceSteps = [
+  { label: 'Facts', path: '/demo/provenance/a', dataContent: 'A' },
+  { label: 'Analysis', path: '/demo/provenance/b', dataContent: 'B' },
+  { label: 'Strategy', path: '/demo/provenance/c', dataContent: 'C' },
+];
+
 export function DemoProvenanceA() {
   return (
     <DemoLevel
       title="Foundation Facts"
       description="Basic, verifiable facts that serve as the foundation for analysis"
       nextPath="/demo/provenance/b"
+      currentStep="/demo/provenance/a"
+      steps={provenanceSteps}
     >
       <CrdblCard
         title={data.A1.title}
@@ -111,6 +119,8 @@ export function DemoProvenanceB() {
       description="Analysis that builds upon and connects foundation facts"
       prevPath="/demo/provenance/a"
       nextPath="/demo/provenance/c"
+      currentStep="/demo/provenance/b"
+      steps={provenanceSteps}
     >
       <CrdblCard
         title={data.B1.title}
@@ -140,6 +150,8 @@ export function DemoProvenanceC() {
       title="Strategic Conclusions"
       description="Strategic conclusions that synthesize all previous levels"
       prevPath="/demo/provenance/b"
+      currentStep="/demo/provenance/c"
+      steps={provenanceSteps}
     >
       <CrdblCard
         title={data.C1.title}
