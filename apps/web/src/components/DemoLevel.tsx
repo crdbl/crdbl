@@ -54,19 +54,17 @@ export function DemoLevel({
 
       <div className="flex flex-col gap-8">{children}</div>
 
-      <div className="divider"></div>
-
       <div className="flex justify-between items-center">
         <div className="flex-1"></div>
         <div className="join">
           {prevPath && (
             <Link to={prevPath} className="join-item btn">
-              Previous Level
+              Previous
             </Link>
           )}
           {nextPath && (
             <Link to={nextPath} className="join-item btn btn-primary">
-              Next Level
+              Next
             </Link>
           )}
         </div>
