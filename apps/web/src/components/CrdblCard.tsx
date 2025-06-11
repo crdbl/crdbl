@@ -2,6 +2,7 @@ interface CrdblCardProps {
   title: string;
   content: string;
   context?: string[];
+  contradictions?: string[];
   whyWorks: string[];
   crdblId: string;
   label: string;
@@ -12,6 +13,7 @@ export function CrdblCard({
   title,
   content,
   context,
+  contradictions,
   whyWorks,
   crdblId,
   label,
@@ -41,6 +43,21 @@ export function CrdblCard({
                   </li>
                 );
               })}
+            </ul>
+          </div>
+        )}
+
+        {contradictions && contradictions.length > 0 && (
+          <div className="mt-6">
+            <h3 className="font-semibold text-left mb-2">
+              Example Contradictions
+            </h3>
+            <ul className="list-disc list-inside text-left">
+              {contradictions.map((contradiction: string, i: number) => (
+                <li key={i} className="ml-4">
+                  {contradiction}
+                </li>
+              ))}
             </ul>
           </div>
         )}
