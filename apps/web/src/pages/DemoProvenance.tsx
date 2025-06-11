@@ -17,6 +17,7 @@ const data = {
       "The global average temperature has increased by 1.1°C since pre-industrial times according to NASA's 2023 climate report.",
     context: [],
     whyWorks: ["Clear, factual, measurable claim that's easy to verify."],
+    contradictions: ['Global temperatures have decreased recently'],
   },
   A2: {
     title: 'Renewable Energy Stat',
@@ -24,6 +25,7 @@ const data = {
       'Solar panel costs decreased by 90% between 2010 and 2023, according to the International Renewable Energy Agency.',
     context: [],
     whyWorks: ['Specific, quantifiable fact with clear attribution.'],
+    contradictions: ['Solar panel costs have increased significantly'],
   },
   A3: {
     title: 'Tech Adoption Rate',
@@ -31,6 +33,7 @@ const data = {
       'Electric vehicle sales grew 35% globally in 2023, reaching 14.1 million units sold worldwide.',
     context: [],
     whyWorks: ["Recent, specific data that's verifiable."],
+    contradictions: ['Electric vehicle sales declined in 2023'],
   },
   B1: {
     title: 'Climate Impact Analysis',
@@ -85,25 +88,19 @@ export function DemoProvenanceA() {
       steps={provenanceSteps}
     >
       <CrdblCard
-        title={data.A1.title}
-        content={data.A1.content}
-        whyWorks={data.A1.whyWorks}
+        {...data.A1}
         crdblId={crdbls.A1}
         label={getLabel(crdbls.A1)}
         getRefData={getRefData}
       />
       <CrdblCard
-        title={data.A2.title}
-        content={data.A2.content}
-        whyWorks={data.A2.whyWorks}
+        {...data.A2}
         crdblId={crdbls.A2}
         label={getLabel(crdbls.A2)}
         getRefData={getRefData}
       />
       <CrdblCard
-        title={data.A3.title}
-        content={data.A3.content}
-        whyWorks={data.A3.whyWorks}
+        {...data.A3}
         crdblId={crdbls.A3}
         label={getLabel(crdbls.A3)}
         getRefData={getRefData}
@@ -123,19 +120,13 @@ export function DemoProvenanceB() {
       steps={provenanceSteps}
     >
       <CrdblCard
-        title={data.B1.title}
-        content={data.B1.content}
-        context={data.B1.context}
-        whyWorks={data.B1.whyWorks}
+        {...data.B1}
         crdblId={crdbls.B1}
         label={getLabel(crdbls.B1)}
         getRefData={getRefData}
       />
       <CrdblCard
-        title={data.B2.title}
-        content={data.B2.content}
-        context={data.B2.context}
-        whyWorks={data.B2.whyWorks}
+        {...data.B2}
         crdblId={crdbls.B2}
         label={getLabel(crdbls.B2)}
         getRefData={getRefData}
@@ -154,10 +145,7 @@ export function DemoProvenanceC() {
       steps={provenanceSteps}
     >
       <CrdblCard
-        title={data.C1.title}
-        content={data.C1.content}
-        context={data.C1.context}
-        whyWorks={data.C1.whyWorks}
+        {...data.C1}
         crdblId={crdbls.C1}
         label={getLabel(crdbls.C1)}
         getRefData={getRefData}
